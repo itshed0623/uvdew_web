@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="shortcut icon" href="./images/623706670_933528319068570_7706221529996436771_n.png" type="image/x-icon">
+</head>
+
+<body>
+    <main class="login_page">
+        <div class="user_header">
+            <img src="./images/623706670_933528319068570_7706221529996436771_n.png" alt="UVDEW Logo" class="logo">
+            <div class="title">
+                <strong>UV Disinfection & Edible Wax</strong><br />
+                <small>Coat | Dragon Fruit</small>
+            </div>
+        </div>
+        <form action="" class="form_group">
+            <div class="pill">
+                <input type="text" id="username" required>
+                <label for="username" class="username">Username</label>
+            </div>
+            <div class="pill">
+                <input type="password" id="password" required>
+                <label for="password">Password</label>
+                <button type="button" class="eye-btn" onclick="togglePassword()">
+                    <svg id="eye-open" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22"
+                        fill="none" stroke="currentColor" stroke-width="1.6">
+                        <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z" />
+                        <circle cx="12" cy="12" r="3.2" />
+                    </svg>
+                    <svg id="eye-closed" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22"
+                        fill="none" stroke="currentColor" stroke-width="1.6" style="display:none">
+                        <path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a20.74 20.74 0 0 1 5-5.12" />
+                        <path d="M1 1l22 22" />
+                    </svg>
+                </button>
+
+            </div>
+            <div class="signupBtn">
+                <p>Don't have an account? <a href="./signup_page.html">Signup</a></p>
+            </div>
+            <button type="submit" class="submit_container">Login</button>
+        </form>
+    </main>
+
+
+    <script>
+        function togglePassword() {
+            const password = document.getElementById('password');
+            const open = document.getElementById('eye-open');
+            const close = document.getElementById('eye-closed');
+
+            if (password.type === 'password') {
+                password.type = 'text';
+                open.style.display = 'none';
+                close.style.display = 'inline';
+            } else if (password.type === 'text') {
+                password.type = 'password';
+                open.style.display = 'inline';
+                close.style.display = 'none';
+            }
+        }
+    </script>
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
+        import { getDatabase, ref, get }
+            from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+            apiKey: "AIzaSyC6A2bCnL6XtYCwxOqysQD6ppbq54T1Nio",
+            authDomain: "uvdew-d94df.firebaseapp.com",
+            databaseURL: "https://uvdew-d94df-default-rtdb.firebaseio.com",
+            projectId: "uvdew-d94df",
+            storageBucket: "uvdew-d94df.firebasestorage.app",
+            messagingSenderId: "525716346378",
+            appId: "1:525716346378:web:5a3bec41e2dc7f718871f3",
+            measurementId: "G-M2ZT1M1E3N"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+
+        const auth = getAuth();
+        const db = getDatabase();
+
+        const form = document.querySelector(".form_group");
+
+        form.addEventListener("submit", function (e) {
+            e.preventDefault();
+            signIn();
+        })
+
+        function signIn() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            signInWithEmailAndPassword(auth, username, password)
+                .then((userCredential) => {
+
+                    const user = userCredential.user;
+
+                    // Get role from database
+                    get(ref(db, "users/" + user.uid))
+                        .then((snapshot) => {
+
+                            const role = snapshot.val().role;
+
+                            if (role === "admin") {
+                                window.location = "admin_page.html";
+                            }
+                            else if (role === "operator") {
+                                window.location = "operator_page.html";
+                            }
+                        });
+                })
+                .catch(error => {
+                    alert("Login Failed");
+                })
+        }
+        // const db = getDatabase(app);
+        // const studentRef = ref(db, "students");
+        // get(studentRef).then((snapshot) => {
+        //     if (snapshot.exists()) {
+        //         console.log(snapshot.val());
+        //     } else {
+        //         console.log("No data available");
+        //     }
+        // }).catch((error) => {
+        //     console.error(error);
+        // });
+
+
+    </script>
+</body>
+
+</html>

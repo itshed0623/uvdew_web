@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="./css/operator_style.css">
+    <link rel="stylesheet" href="./css/modal.css">
+    <link rel="shortcut icon" href="./images/623706670_933528319068570_7706221529996436771_n.png" type="image/x-icon">
+</head>
+
+<body>
+    <header>
+        <div class="user_header">
+            <img src="./images/623706670_933528319068570_7706221529996436771_n.png" alt="UVDEW Logo" class="logo">
+            <h3>Welcome Admin</h3>
+        </div>
+        <div class="logout_container">
+            <button type="button" id="logoutBtn" class="logoutBtn">Logout</button>
+        </div>
+    </header>
+    <main>
+        <div class="side-bar">
+            <div class="processed">
+                <div class="processed_fill">
+                    <i class="fa-solid fa-droplet fa-2xl" style="color: #b61b5a;"></i>
+                    <h2>Total Processed</h2>
+                </div>
+                <h1>1,245</h1>
+            </div>
+            <div class="processes" id="operator">
+                <i class="fa-solid fa-user fa-2xl" style="color: #b61b5a;"></i>
+                <h2>List of Operators</h2>
+            </div>
+            <div class="notif">
+                <h2>Notifications</h2>
+                <div class="activity_wrap">
+                    <p>UV lamp needs replacement</p>
+                </div>
+            </div>
+        </div>
+        <section class="cont-reports">
+            <div class="cont_container">
+                <h2>System Device Control</h2>
+                <ul>
+                    <li class="control-pill" id="powerBtn">
+                        <i class="fa-solid fa-power-off fa-2xl" style="color: #b61b5a;"></i>
+                        <h4>Power On/Off</h4>
+                    </li>
+                    <li class="control-pill" id="systemCheckUp">
+                        <i class="fa-regular fa-square-check fa-2xl" style="color: #b61b5a;"></i>
+                        <h4>System Checkup</h4>
+                    </li>
+                    <li class="control-pill" id="systemSetting">
+                        <i class="fa-solid fa-gears fa-2xl" style="color: #b61b5a;"></i>
+                        <h4>System Settings</h4>
+                    </li>
+                </ul>
+            </div>
+            <div class="report_container">
+                <h2>Reports and Analytics</h2>
+                <ul>
+                    <li class="control-pill">
+                        <h4>Daily Report</h4>
+                    </li>
+                    <li class="control-pill">
+                        <h4>Weekly Report</h4>
+                    </li>
+                    <li class="control-pill">
+                        <h4>Monthly Report</h4>
+                    </li>
+                </ul>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <div class="activity_container">
+            <h2>Recent Activity</h2>
+            <div class="activity_wrap">
+                <p>Batch #2234 completed - UV Disinfection and Wax Coating successful.</p>
+                <p>Operator John started new batch #2234.</p>
+            </div>
+        </div>
+
+    </footer>
+
+    <div id="power_modal" class="power_modal">
+        <div class="modal_content">
+            <div class="modal_text">
+                <h3>Are you sure you want to turn off the device?</h3>
+            </div>
+            <div class="modal_button">
+                <button type="button" class="yesBtn" id="yesBtn">Yes</button>
+                <button type="button" class="noBtn" id="noBtn">No</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="checkup_modal" class="checkup_modal">
+        <div class="modal_content_checkup">
+            <i class="fa-solid fa-arrow-left-long" id="back_check"></i>
+            <div class="modal_title">
+                <h1>System Check Up</h1>
+            </div>
+            <div class="modal_text">
+                <ul>
+                    <li>
+                        <h3>Hardware Health Status</h3>
+                        <small>UV lamp condition / intensity health</small><br>
+                        <small>Conveyor motor status</small> <br>
+                        <small>Nozzle condition /Clog Detection</small> <br>
+                        <small>Sensor diagnostics</small><br>
+                        <small>Cooling / Fan system status</small><br>
+                        <small>Power supply status</small><br>
+                    </li>
+                    <li>
+                        <h3>Operational Function Test</h3>
+                        <small>UV disinfection test run</small><br>
+                        <small>Wax spray level and test</small><br>
+                        <small>Coveyor movement test</small><br>
+                        <small>Drying performance check</small><br>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="setting_modal" class="setting_modal">
+        <div class="modal_content_settings">
+            <i class="fa-solid fa-arrow-left-long" id="back_setting"></i>
+            <div class="modal_title">
+                <h1>System Settings</h1>
+            </div>
+            <div class="modal_text">
+                <ul>
+                    <li>
+                        <h3>UV Lamp Settings</h3>
+                        <small>Intensity level</small>
+                        <input type="radio" name="level" id="" checked><small>Low</small> <input type="radio"
+                            name="level" id=""><small>Medium</small> <input type="radio" name="level"
+                            id=""><small>High</small>
+                        <br>
+                        <small>Exposure time (seconds)</small><input type="range" name="" id="time"><small
+                            id="time_text">250s</small><br>
+                    </li>
+                    <li>
+                        <h3>Wax Coating Parameters</h3>
+                        <small>Spray duration and nozzle pressure</small><input type="range" name="" id="spray"><small
+                            id="spray_text">50%</small><br>
+                        <small>Wax solution ratio</small><br>
+                        <small>Drying time control</small><br>
+                    </li>
+                    <li>
+                        <h3>Connectivity</h3>
+                        <small>Wi-fi connection</small>
+                        <small style="color: darkgreen;">Good</small> </h6>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="operator_modal" class="operator_modal">
+        <div class="modal_content_operator">
+            <i class="fa-solid fa-arrow-left-long" id="back_operator"></i>
+            <div class="modal_title">
+                <h1>List of Operators</h1>
+            </div>
+            <div class="control-pill-operator">
+                <i class="fa-solid fa-user fa-2xl" style="color: #b61b5a;"></i>
+                <div>
+                    <strong id="username_display">Username</strong><br>
+                    <strong>Number of Processed fruit</strong>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const logoutBtn = document.getElementById("logoutBtn");
+
+        logoutBtn.onclick = function () {
+            window.location = "index.html";
+        }
+
+        const power_modal = document.getElementById("power_modal");
+        const checkup_modal = document.getElementById("checkup_modal");
+        const setting_modal = document.getElementById("setting_modal");
+        const operator_modal = document.getElementById("operator_modal");
+        const yesBtn = document.getElementById("yesBtn");
+        const noBtn = document.getElementById("noBtn");
+        const back_check = document.getElementById("back_check");
+        const back_setting = document.getElementById("back_setting");
+        const back_operator = document.getElementById("back_operator");
+
+
+        document.getElementById("powerBtn").addEventListener("click", function () {
+            power_modal.style.display = "block";
+        });
+        noBtn.onclick = function () {
+            power_modal.style.display = "none";
+        }
+
+        yesBtn.onclick = function (e) {
+            power_modal.style.display = "none";
+        }
+        document.getElementById("systemCheckUp").addEventListener("click", function () {
+            checkup_modal.style.display = "block";
+        });
+
+        document.getElementById("systemSetting").addEventListener("click", function () {
+            setting_modal.style.display = "block";
+        });
+
+        document.getElementById("operator").addEventListener("click", function () {
+            operator_modal.style.display = "block";
+        });
+
+        back_check.onclick = function () {
+            checkup_modal.style.display = "none";
+        };
+        back_setting.onclick = function () {
+            setting_modal.style.display = "none";
+        };
+
+        back_operator.onclick = function () {
+            operator_modal.style.display = "none";
+        };
+
+
+        window.onclick = function (e) {
+            if (e.target == checkup_modal) {
+                checkup_modal.style.display = "none";
+            } else if (e.target == power_modal) {
+                power_modal.style.display = "none";
+            } else if (e.target == setting_modal) {
+                setting_modal.style.display = "none";
+            } else if (e.target == operator_modal) {
+                operator_modal.style.display = "none";
+            }
+        }
+
+
+        const time = document.getElementById("time");
+
+        time.addEventListener("change", function () {
+            document.getElementById("time_text").innerHTML = time.value * 5 + 's';
+        });
+
+        const spray = document.getElementById("spray");
+
+        spray.addEventListener("change", function () {
+            document.getElementById("spray_text").innerHTML = spray.value + '%';
+        });
+
+    </script>
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+        import { getDatabase, ref, get, query, orderByChild, equalTo }
+            from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+            apiKey: "AIzaSyC6A2bCnL6XtYCwxOqysQD6ppbq54T1Nio",
+            authDomain: "uvdew-d94df.firebaseapp.com",
+            databaseURL: "https://uvdew-d94df-default-rtdb.firebaseio.com",
+            projectId: "uvdew-d94df",
+            storageBucket: "uvdew-d94df.firebasestorage.app",
+            messagingSenderId: "525716346378",
+            appId: "1:525716346378:web:5a3bec41e2dc7f718871f3",
+            measurementId: "G-M2ZT1M1E3N"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+
+        const db = getDatabase();
+
+        const usersRef = ref(db, "users");
+
+        // get(usersRef).then((snapshot) => {
+        //     snapshot.forEach((childSnapshot) => {
+        //         const userData = childSnapshot.val();
+
+        //         userData.email.forEach(email => {
+
+        //         });
+        //         console.log(userData.email); // gets each email
+        //     });
+        // });
+
+        // Query users where role is "admin"
+        // const usersRef = ref(db, "users");
+        const adminQuery = query(usersRef, orderByChild("role"), equalTo("operator"));
+
+        get(adminQuery).then((snapshot) => {
+            if (snapshot.exists()) {
+                snapshot.forEach((childSnapshot) => {
+                    const data = childSnapshot.val();
+                    const userEmail = data.email;
+                    document.getElementById("username_display").innerHTML = userEmail;
+
+                    console.log(data.email); // ✅ admin@gmail.com
+                });
+            } else {
+                console.log("No admin found");
+            }
+        });
+        // const db = getDatabase(app);
+        // const studentRef = ref(db, "students");
+        // get(studentRef).then((snapshot) => {
+        //     if (snapshot.exists()) {
+        //         console.log(snapshot.val());
+        //     } else {
+        //         console.log("No data available");
+        //     }
+        // }).catch((error) => {
+        //     console.error(error);
+        // });
+
+
+    </script>
+</body>
+
+</html>

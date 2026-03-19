@@ -1,0 +1,205 @@
+.power_modal{
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  padding-top: 200px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+}
+
+.modal_content {
+  position: relative;
+  background-color: #d2d2d2;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 40%;
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+  height: 40%;
+  border-radius: 25px;
+  -webkit-animation-name: animatetop;
+  -webkit-animation-duration: 0.4s;
+  animation-name: animatetop;
+  animation-duration: 0.4s
+}
+
+
+.checkup_modal{
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  padding-top: 100px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+}
+
+.setting_modal{
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  padding-top: 100px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+}
+
+.operator_modal{
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  padding-top: 100px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+}
+
+.modal_content_checkup {
+  position: relative;
+  background-color: #d2d2d2;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 40%;
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+  height: 60%;
+  border-radius: 25px;
+  -webkit-animation-name: animatetop;
+  -webkit-animation-duration: 0.4s;
+  animation-name: animatetop;
+  animation-duration: 0.4s
+}
+
+.modal_content_settings {
+  position: relative;
+  background-color: #d2d2d2;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 40%;
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+  height: 60%;
+  border-radius: 25px;
+  -webkit-animation-name: animatetop;
+  -webkit-animation-duration: 0.4s;
+  animation-name: animatetop;
+  animation-duration: 0.4s
+}
+
+.modal_content_operator {
+  position: relative;
+  background-color: #d2d2d2;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 40%;
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+  height: 60%;
+  border-radius: 25px;
+  -webkit-animation-name: animatetop;
+  -webkit-animation-duration: 0.4s;
+  animation-name: animatetop;
+  animation-duration: 0.4s
+}
+
+@-webkit-keyframes animatetop {
+  from {top:-300px; opacity:0} 
+  to {top:0; opacity:1}
+}
+
+@keyframes animatetop {
+  from {top:-300px; opacity:0}
+  to {top:0; opacity:1}
+}
+
+.modal_title{
+    display: flex;
+    justify-content: center;
+    max-height: 50px;
+}
+
+.modal_text{
+    margin-left: 2%;
+    margin-bottom: 35%;
+}
+
+.modal_content_checkup .modal_text{
+    margin-bottom: 10% ;
+}
+.modal_button{
+    position: relative;
+    left: 70%;
+}
+
+.yesBtn{
+    width: 15%;
+    /* max-width: 360px;
+    min-width: 240px; */
+    height: 50px;
+    border-radius: 8px;
+    border: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: white;
+    cursor: pointer;
+    background: linear-gradient(180deg,  rgba(106, 106, 106, 0.519), rgba(0, 0, 0, 0.542));
+    /* box-shadow: 0 12px 0 rgba(58, 58, 58, 0.715), 0 22px 30px rgba(0, 0, 0, 0.25), inset 0 6px 12px rgba(255, 255, 255, 0.06); */
+    transition: transform .12s ease, box-shadow .12s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.noBtn{
+    width: 15%;
+    /* max-width: 360px;
+    min-width: 240px; */
+    height: 50px;
+    border-radius: 8px;
+    border: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: white;
+    cursor: pointer;
+    background: linear-gradient(180deg, rgba(179, 12, 86, 0.8), rgba(160, 10, 78, 0.8));
+    /* box-shadow: 0 12px 0 rgba(179, 12, 86, 0.8), 0 22px 30px rgba(0, 0, 0, 0.25), inset 0 6px 12px rgba(255, 255, 255, 0.06); */
+    transition: transform .12s ease, box-shadow .12s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.control-pill-operator{
+    display: flex;
+    align-items: center;
+    max-width: 100%;
+    /* background-color: rgba(0, 0, 0, 0.18); */
+    margin-top: 50px;
+    border-radius: 50px;
+    padding-left: 10%;
+    height: 50px;
+    background: linear-gradient(90deg, rgba(120, 120, 120, 0.468), rgba(100, 99, 99, 0.66));
+    border: 1px solid rgba(255, 255, 255, 0.305);
+    /* border: 1px solid rgba(255, 255, 255, 0.05); */
+}
+
+.control-pill-operator i{
+    margin-right: 50px;
+}
