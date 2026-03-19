@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="./css/operator_style.css">
+    <link rel="shortcut icon" href="./images/623706670_933528319068570_7706221529996436771_n.png" type="image/x-icon">
+</head>
+
+<body>
+    <header>
+        <div class="user_header">
+            <img src="./images/623706670_933528319068570_7706221529996436771_n.png" alt="UVDEW Logo" class="logo">
+            <h3>Welcome Operator</h3>
+        </div>
+        <div class="logout_container">
+            <button id="logoutBtn" class="logoutBtn">Logout</button>
+        </div>
+    </header>
+    <main>
+        <aside>
+            <div class="dc_container">
+                <h4>System Device Control</h4>
+            </div>
+            <div class="control_container">
+                <ul>
+                    <li class="control-pill" onclick="powerOn()">
+                        <i class="fa-solid fa-power-off fa-2xl" style="color: #b61b5a;"></i>
+                        <h4>Start System</h4>
+                    </li>
+                    <li class="control-pill">
+                        <i class="fa-solid fa-lightbulb fa-2xl" style="color: #b61b5a;"></i>
+                        <h4>UV Disinfect</h4>
+                    </li>
+                    <li class="control-pill">
+                        <i class="fa-solid fa-droplet fa-2xl" style="color: #b61b5a;"></i>
+                        <h4>Wax Coat</h4>
+                    </li>
+                    <li class="control-pill">
+                        <i class="fa-solid fa-circle-stop fa-2xl" style="color: #b61b5a;"></i>
+                        <h4>Emergency Stop</h4>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+        <section>
+            <div class="process_container">
+                <div class="process">
+                    <div class="processName">
+                        <h2>UV Intensity</h2>
+                        <div class="intensity">
+                            <h1>150</h1>
+                            <h3>mW/cm<sup>2</sup></h3>
+                        </div>
+                    </div>
+                    <div class="processName">
+                        <h2>Wax Coating</h2>
+                        <div class="progress-wrap">
+                            <div class="progress-track">
+                                <div id="waxBar" class="progress-fill" style="width:35%"></div>
+                            </div>
+                        </div>
+                        <p>Processing....</p>
+                    </div>
+                    <div class="processName">
+                        <h2>Process Timer</h2>
+                        <div>
+                            <h1>00:00:00</h1>
+                        </div>
+                    </div>
+                </div>
+                <div class="temp_not">
+                    <div class="processName">
+                        <h2>Temperature</h2>
+                        <div class="intensity">
+                            <h1>35</h1>
+                            <h3 class="degree"><sup>o</sup>C</h3>
+                        </div>
+                    </div>
+                    <div class="notification">
+                        <h2>Notifications</h2>
+                        <div>
+                            <p class="paragraph">UV lampp needs replacement</p>
+                            <p class="paragraph">Too high temperature</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const logoutBtn = document.getElementById("logoutBtn");
+
+        logoutBtn.onclick = function () {
+            window.location = "index.html";
+        }
+    </script>
+
+</body>
+
+</html>
