@@ -96,7 +96,7 @@ main {
 }
 
 aside {
-    width: 30%;
+    width: 33%;
     max-height: 30rem;
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.533), rgba(255, 255, 255, 0.02));
     /* background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)); */
@@ -343,7 +343,7 @@ section {
 }
 
 .process {
-    width: 50%;
+    width: 33%;
     /* background: rgba(255, 255, 255, 0.348); */
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.533), rgba(255, 253, 253, 0.144));
     /* background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)); */
@@ -439,7 +439,7 @@ section {
 }
 
 .temp_not{
-    width: 50%;
+    width: 33%;
     /* background: rgba(255, 255, 255, 0.348); */
     margin-left: 3%;
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.533), rgba(255, 255, 255, 0.02));
