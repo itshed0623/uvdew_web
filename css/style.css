@@ -240,6 +240,9 @@ select:-webkit-autofill {
     .login_page{
         padding: 50px 10px 5px;
     }
+    .signup_page{
+        padding: 50px 10px 5px;
+    }
     .eye-btn{
     transform: translateX(-200%) translateY(-40%);
     }
