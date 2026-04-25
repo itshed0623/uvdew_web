@@ -211,12 +211,12 @@
   display: flex;
   justify-content: center;
   
-    display: none;
 }
 
 .notification-card{
     position: absolute;
     top: 90px;
+    display: none;
 
     /* transform: translateX(270%); */
     padding: 18px;
