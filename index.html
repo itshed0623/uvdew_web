@@ -118,7 +118,10 @@
                     // Get role from database
                     get(ref(db, "users/" + user.uid))
                         .then((snapshot) => {
+                            if (!snapshot.exists()) {
+                                alert("Unregistered Account");
 
+                            }
                             const role = snapshot.val().role;
 
                             if (role === "admin") {
@@ -133,6 +136,8 @@
                                 localStorage.setItem("username", username);
                                 localStorage.setItem("role", role);
                                 window.location = "operator_page.html";
+                            } else if (role === "deleted") {
+                                alert("Deleted Account");
                             }
                         });
                 })

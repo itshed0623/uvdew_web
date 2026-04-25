@@ -233,13 +233,20 @@
             <div class="modal_title">
                 <h1>List of Operators</h1>
             </div>
-            <div class="control-pill-operator">
-                <i class="fa-solid fa-user fa-2xl" style="color: #b61b5a;"></i>
-                <div>
+            <div id="user-list">
+                <div class="control-pill-operator">
+                    <!-- <i class="fa-solid fa-user fa-2xl control-item" style="color: #b61b5a;"></i>
+                <div class="control-item-middle">
                     <strong id="username_display">Username</strong><br>
-                    <strong>No. of Processed fruit: <b>25</b></strong>
+                    <strong>No. of Processed fruit: <b>25</b></strong><br>
+                </div>
+                <button class="red no-design right control-item delete-user">Delete</button>
+                <i class="fa-solid fa-trash trash"></i> -->
+
                 </div>
             </div>
+
+
         </div>
 
     </div>
@@ -338,7 +345,7 @@
     <script type="module">
         // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-        import { getDatabase, ref, get, query, orderByChild, equalTo }
+        import { getDatabase, ref, get, query, orderByChild, equalTo, remove, update }
             from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
 
         // TODO: Add SDKs for Firebase products that you want to use
@@ -377,21 +384,71 @@
 
         // Query users where role is "admin"
         // const usersRef = ref(db, "users");
+
+        const userList = document.getElementById("user-list");
         const adminQuery = query(usersRef, orderByChild("role"), equalTo("operator"));
 
         get(adminQuery).then((snapshot) => {
+
+            userList.innerHTML = "";
             if (snapshot.exists()) {
                 snapshot.forEach((childSnapshot) => {
                     const data = childSnapshot.val();
+                    const uid = childSnapshot.key;
                     const userEmail = data.email;
-                    document.getElementById("username_display").innerHTML = userEmail;
 
-                    console.log(data.email); // ✅ admin@gmail.com
+                    console.log(userEmail);
+
+                    const row = document.createElement("div");
+                    row.classList.add("control-pill-operator");
+
+                    row.innerHTML = `
+                        <i class="fa-solid fa-user fa-2xl control-item" style="color: #b61b5a;"></i>
+                        <div class="control-item-middle">
+                            <strong id="username_display">${userEmail}</strong><br>
+                            <strong>No. of Processed fruit: <b>27</b></strong><br>
+                        </div>
+                        <button class="red no-design right control-item delete-user" onclick="deleteUser('${uid}')">Delete</button>
+                        <i class="fa-solid fa-trash trash" onclick="deleteUser('${uid}')"></i>
+                    `;
+                    // document.getElementById("username_display").innerHTML = userEmail;
+
+                    // console.log(data.email); // ✅ admin@gmail.com
+
+                    userList.appendChild(row);
                 });
             } else {
                 console.log("No admin found");
             }
         });
+
+
+        window.deleteUser = function (uid) {
+
+            if (confirm("Delete this user?")) {
+
+                const userRef = ref(db, "users/" + uid);
+
+                update(userRef, {
+                    role: "deleted"
+                })
+                    .then(() => {
+                        alert("User deleted");
+                        location.reload();
+                    })
+                    ;
+                remove(userRef)
+                    .then(() => {
+                        alert("User deleted");
+                        location.reload(); // refresh list
+                    })
+                    .catch((error) => {
+                        alert("Delete failed");
+                        console.error(error);
+                    });
+
+            }
+        }
         // const db = getDatabase(app);
         // const studentRef = ref(db, "students");
         // get(studentRef).then((snapshot) => {
