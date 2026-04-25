@@ -122,9 +122,16 @@
                             const role = snapshot.val().role;
 
                             if (role === "admin") {
+
+                                localStorage.setItem("loggedin", "true");
+                                localStorage.setItem("username", username);
+                                localStorage.setItem("role", role);
                                 window.location = "admin_page.html";
                             }
                             else if (role === "operator") {
+                                localStorage.setItem("loggedin", "true");
+                                localStorage.setItem("username", username);
+                                localStorage.setItem("role", role);
                                 window.location = "operator_page.html";
                             }
                         });

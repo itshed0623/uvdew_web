@@ -138,9 +138,20 @@
     </main>
 
     <script>
+        const loggedin = localStorage.getItem("loggedin");
+        const username = localStorage.getItem("username");
+        const role = localStorage.getItem("role");
+
+        if (loggedin !== "true" || role !== "operator") {
+            window.location = "index.html";
+        }
+
         const logoutBtn = document.getElementById("logoutBtn");
 
         logoutBtn.onclick = function () {
+            localStorage.removeItem("loggedin");
+            localStorage.removeItem("username");
+            localStorage.removeItem("role");
             window.location = "index.html";
         }
     </script>
