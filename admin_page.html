@@ -18,10 +18,71 @@
             <h3>Welcome Admin</h3>
         </div>
         <div class="logout_container">
-            <button type="button" id="notifBtn" class="notifBtn"><i class="fa-solid fa-bell"></i></button>
-            <button type="button" id="logoutBtn" class="logoutBtn">Logout</button>
+            <button type="button" id="notifBtn" class="notifBtn" onclick="toggleNotif()"><i
+                    class="fa-solid fa-bell"></i></button>
+            <!-- <div class="card-container" id="card-container"> -->
+            <div class="card notification-card" id="notification-card">
+                <div id="notif-dropdown" class="notif-dropdown">
+                    <span class="notif-title">
+                        <i class="fa fa-bell"></i> Notifications
+                    </span>
+                    <div class="notif-item warning">
+                        UV lamp needs replacement
+                    </div>
+
+                    <div class="notif-item">
+                        Filter cleaning due tomorrow
+                    </div>
+
+                    <div class="notif-item">
+                        System checkup completed
+                    </div>
+
+                    <div class="notif-item empty">
+                        No more notifications
+                    </div>
+                </div>
+            </div>
+            <!-- </div> -->
+            <script>
+
+                let notif = 'false';
+                const dropdown = document.getElementById("notification-card");
+                const notifBtn = document.getElementById("notifBtn");
+
+                document.addEventListener("click", function (e) {
+                    if (!notifBtn.contains(e.target)) {
+                        dropdown.style.display = 'none';
+                    }
+                });
+                function toggleNotif() {
+
+
+
+                    // dropdown.classList.toggle("open");
+
+                    if (notif == 'false') {
+
+                        dropdown.style.display = 'block';
+                        notif = 'true';
+                    } else {
+                        dropdown.style.display = 'none';
+                        notif = 'false';
+                    }
+
+                    // if (dropdown.classList.contains("open")) {
+                    //     arrow.style.transform = "rotate(180deg)";
+                    // } else {
+                    //     arrow.style.transform = "rotate(0deg)";
+                    // }
+                }
+
+            </script>
+            <button type=" button" id="logoutBtn" class="logoutBtn">Logout</button>
         </div>
     </header>
+
+
     <main class="admin-main">
         <div class="side-bar">
             <div class="processed">
@@ -329,6 +390,7 @@
         // }).catch((error) => {
         //     console.error(error);
         // });
+
 
 
     </script>
