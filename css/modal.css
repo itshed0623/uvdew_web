@@ -20,7 +20,7 @@
   border: 1px solid #888;
   width: 40%;
   box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
-  height: 40%;
+  /* height: 40%; */
   border-radius: 25px;
   -webkit-animation-name: animatetop;
   -webkit-animation-duration: 0.4s;
@@ -202,4 +202,49 @@
 
 .control-pill-operator i{
     margin-right: 50px;
+}
+
+/* Medium devices (landscape tablets, 768px and up) */
+@media only screen and (max-width: 783px) {
+    .control-pill-operator{
+
+    padding-top: 10px;
+    padding-bottom: 10px;
+    }
+
+    .control-pill-operator i{
+    margin-right: 10px;
+}
+}
+
+@media only screen and (max-width: 600px) {
+  .modal_content_operator{
+    margin: 0 10%;
+    width: auto;
+  }
+
+  .modal_content{
+    margin: 0 10%;
+    width: auto;
+  }
+
+  .yesBtn, .noBtn{
+    height: auto;
+    padding: 2% 0;
+  }
+  
+  .modal_content_checkup{
+    margin: 0 10%;
+    width: auto;
+  }
+
+  .modal_content_settings{
+    margin: 0 10%;
+    width: auto;
+  }
+
+  .enter{
+    /* display: flex; */
+    /* flex-wrap: wrap; */
+  }
 }
