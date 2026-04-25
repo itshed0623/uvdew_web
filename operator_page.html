@@ -29,7 +29,7 @@
                 <ul>
                     <li class="control-pill" onclick="powerOn()">
                         <i class="fa-solid fa-power-off fa-2xl" style="color: #b61b5a;"></i>
-                        <h4>Start System</h4>
+                        <h4 id="start">Start System</h4>
                     </li>
                     <li class="control-pill">
                         <i class="fa-solid fa-lightbulb fa-2xl" style="color: #b61b5a;"></i>
@@ -154,6 +154,162 @@
             localStorage.removeItem("role");
             window.location = "index.html";
         }
+    </script>
+
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+        import { getDatabase, ref, get, query, orderByChild, equalTo, remove, update, onValue }
+            from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+            apiKey: "AIzaSyC6A2bCnL6XtYCwxOqysQD6ppbq54T1Nio",
+            authDomain: "uvdew-d94df.firebaseapp.com",
+            databaseURL: "https://uvdew-d94df-default-rtdb.firebaseio.com",
+            projectId: "uvdew-d94df",
+            storageBucket: "uvdew-d94df.firebasestorage.app",
+            messagingSenderId: "525716346378",
+            appId: "1:525716346378:web:5a3bec41e2dc7f718871f3",
+            measurementId: "G-M2ZT1M1E3N"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+
+        const db = getDatabase();
+
+        // const usersRef = ref(db, "users");
+        const controlData = ref(db, "control");
+
+        // get(usersRef).then((snapshot) => {
+        //     snapshot.forEach((childSnapshot) => {
+        //         const userData = childSnapshot.val();
+
+        //         userData.email.forEach(email => {
+
+        //         });
+        //         console.log(userData.email); // gets each email
+        //     });
+        // });
+
+        // Query users where role is "admin"
+        // const usersRef = ref(db, "users");
+
+
+        onValue(controlData, (snapshot) => {
+
+            if (snapshot.exists()) {
+                console.log("Data");
+                snapshot.forEach((childSnapshot) => {
+                    const data = childSnapshot.val();
+
+                    const start = data.start;
+
+                    if (start === true) {
+                        document.getElementById("start").innerHTML = "Stop System";
+
+                    } else {
+                        document.getElementById("start").innerHTML = "Start System";
+
+                    }
+
+
+                    window.powerOn = function () {
+                        const setStart = ref(db, "control/DeviceOne");
+
+                        if (start === true) {
+                            update(setStart, {
+                                start: false
+                            })
+                        } else {
+                            update(setStart, {
+                                start: true
+                            })
+                        }
+                    }
+
+
+                });
+            } else {
+                console.log("No data");
+            }
+
+            // if (snapshot.exists()) {
+            //     snapshot.forEach((childSnapshot) => {
+            //         const data = childSnapshot.val();
+            //         const uid = childSnapshot.key;
+            //         const userEmail = data.email;
+
+            //         console.log(userEmail);
+
+            //         const row = document.createElement("div");
+            //         row.classList.add("control-pill-operator");
+
+            //         row.innerHTML = `
+            //                 <i class="fa-solid fa-user fa-2xl control-item" style="color: #b61b5a;"></i>
+            //                 <div class="control-item-middle">
+            //                     <strong id="username_display">${userEmail}</strong><br>
+            //                     <strong>No. of Processed fruit: <b>27</b></strong><br>
+            //                 </div>
+            //                 <button class="red no-design right control-item delete-user" onclick="deleteUser('${uid}')">Delete</button>
+            //                 <i class="fa-solid fa-trash trash" onclick="deleteUser('${uid}')"></i>
+            //             `;
+
+            //         userList.appendChild(row);
+            //     });
+            // } else {
+            //     console.log("No admin found");
+            // }
+        });
+
+
+
+
+        // window.deleteUser = function (uid) {
+
+        //     if (confirm("Delete this user?")) {
+
+        //         const userRef = ref(db, "users/" + uid);
+
+        //         update(userRef, {
+        //             role: "deleted"
+        //         })
+        //             .then(() => {
+        //                 alert("User deleted");
+        //                 location.reload();
+        //             })
+        //             ;
+        //         remove(userRef)
+        //             .then(() => {
+        //                 alert("User deleted");
+        //                 location.reload(); // refresh list
+        //             })
+        //             .catch((error) => {
+        //                 alert("Delete failed");
+        //                 console.error(error);
+        //             });
+
+        //     }
+        // }
+        // const db = getDatabase(app);
+        // const studentRef = ref(db, "students");
+        // get(studentRef).then((snapshot) => {
+        //     if (snapshot.exists()) {
+        //         console.log(snapshot.val());
+        //     } else {
+        //         console.log("No data available");
+        //     }
+        // }).catch((error) => {
+        //     console.error(error);
+        // });
+
+
+
     </script>
 
 </body>
