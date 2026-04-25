@@ -104,7 +104,9 @@
   -webkit-animation-name: animatetop;
   -webkit-animation-duration: 0.4s;
   animation-name: animatetop;
-  animation-duration: 0.4s
+  animation-duration: 0.4s;
+  display: flex;
+  flex-direction: column;
 }
 
 .modal_content_settings {
@@ -115,12 +117,14 @@
   border: 1px solid #888;
   width: 40%;
   box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
-  height: 60%;
+  /* height: 60%; */
   border-radius: 25px;
   -webkit-animation-name: animatetop;
   -webkit-animation-duration: 0.4s;
   animation-name: animatetop;
-  animation-duration: 0.4s
+  animation-duration: 0.4s;
+   display: flex;
+  flex-direction: column;
 }
 
 .modal_content_operator {
@@ -155,20 +159,24 @@
     display: flex;
     justify-content: center;
     max-height: 50px;
-    margin-bottom: 50px;
+    margin-bottom: 20px;
 }
 
 .modal_text{
     margin-left: 2%;
-    margin-bottom: 35%;
+    margin-bottom: 5%;
 }
 
 .modal_content_checkup .modal_text{
-    margin-bottom: 10% ;
+    margin-bottom: 5% ;
 }
 .modal_button{
     position: relative;
     left: 70%;
+}
+
+.power{
+  margin-bottom: 20%;
 }
 
 .yesBtn{
@@ -341,10 +349,52 @@
   display: none !important;
 }
 
+.green{
+  color: #22C55E;
+}
 
+.yellow{
+  color: #EAB308;
+}
 
+.red{
+  color: #EF4444;
+}
+
+.startBtn {
+    width: 100px;
+    /* height: 2rem; */
+    color: rgb(255, 249, 249);
+    border-radius: 50px;
+    border: none;
+    background-color: rgba(55, 55, 55, 0.419);
+    /* box-shadow: 0 26px 30px rgba(0, 0, 0, 0.14), inset 0 8px 18px rgba(255, 255, 255, 0.03); */
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.12);
+}
+
+.startBtn:hover{
+    color: #333;
+    transform: translateY(-2px);
+    background-color: rgba(183, 181, 181, 0.452);
+}
+
+.table{
+  width: 100%;
+}
+
+.table h3{
+  margin: 0;
+}
 @media only screen and (max-width: 1200px) {
    .modal_content_operator{
+    margin: 0 10%;
+    width: auto;
+  }
+  .modal_content_checkup{
+    margin: 0 10%;
+    width: auto;
+  }
+  .modal_content_settings{
     margin: 0 10%;
     width: auto;
   }
@@ -363,6 +413,15 @@
 }
 
   .modal_content_operator{
+    margin: 0 10%;
+    width: auto;
+  }
+   .modal_content_checkup{
+    margin: 0 10%;
+    width: auto;
+  }
+
+  .modal_content_settings{
     margin: 0 10%;
     width: auto;
   }
@@ -398,6 +457,11 @@
   }
 
   .modal_content_settings{
+    margin: 0 2%;
+    padding: 2%;
+    width: auto;
+  }
+  .modal_content_checkup{
     margin: 0 10%;
     width: auto;
   }
@@ -414,5 +478,9 @@
 
   .delete-user{
     display: none;
+  }
+
+  .operation-list{
+    padding-left: 0;
   }
 }

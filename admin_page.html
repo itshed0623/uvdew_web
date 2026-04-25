@@ -150,7 +150,7 @@
 
     <div id="power_modal" class="power_modal">
         <div class="modal_content">
-            <div class="modal_text">
+            <div class="modal_text power">
                 <h3>Are you sure you want to turn off the device?</h3>
             </div>
             <div class="modal_button">
@@ -167,25 +167,173 @@
             <div class="modal_title">
                 <h1>System Check Up</h1>
             </div>
-            <div class="modal_text">
-                <ul>
-                    <li>
-                        <h3>Hardware Health Status</h3>
-                        <small>UV lamp condition / intensity health</small><br>
-                        <small>Conveyor motor status</small> <br>
-                        <small>Nozzle condition /Clog Detection</small> <br>
-                        <small>Sensor diagnostics</small><br>
-                        <small>Cooling / Fan system status</small><br>
-                        <small>Power supply status</small><br>
-                    </li>
-                    <li>
-                        <h3>Operational Function Test</h3>
-                        <small>UV disinfection test run</small><br>
-                        <small>Wax spray level and test</small><br>
-                        <small>Coveyor movement test</small><br>
-                        <small>Drying performance check</small><br>
-                    </li>
-                </ul>
+            <div class="modal_text" style="overflow-y: scroll; flex: 1;">
+                <table class="table">
+                    <tr>
+                        <td colspan="3">
+                            <h3>Hardware Health Status</h3>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3"><small>UV lamp condition / intensity health</small></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <ul>
+                                <li><small>UV intensity Output</small></li>
+                                <li><small>Lamp status</small></li>
+                                <li><small>Lamp age</small></li>
+                            </ul>
+                        </td>
+                        <td>
+                            <ul style="list-style: none;">
+                                <li><small class="green">100%</small></li>
+                                <li><small>ON</small></li>
+                                <li><small>23 hrs</small></li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3"><small>Conveyor motor status</small></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <ul>
+                                <li><small>Overheat warning (°C)</small></li>
+                                <li><small>Motor state</small></li>
+                                <li><small>Speed</small></li>
+                            </ul>
+                        </td>
+                        <td>
+                            <ul style="list-style: none;">
+                                <li><small class="yellow">34°C</small></li>
+                                <li><small>ON</small></li>
+                                <li><small>67 RPM</small></li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3"><small>Nozzle condition /Clog Detection</small></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <ul>
+                                <li><small>Nozzle pressure</small></li>
+                                <li><small>Flow rate</small></li>
+                                <li><small>Clog status</small></li>
+                            </ul>
+                        </td>
+                        <td>
+                            <ul style="list-style: none;">
+                                <li><small class="red">130 PSI</small></li>
+                                <li><small>680 ml/min</small></li>
+                                <li><small>Blocked</small></li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3"><small>Sensor diagnostics</small></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <ul>
+                                <li><small>Sensor status</small></li>
+                                <li><small>Calibration status</small></li>
+                                <li><small>Last calibration date</small></li>
+                            </ul>
+                        </td>
+                        <td>
+                            <ul style="list-style: none;">
+                                <li><small class="green">Ok</small></li>
+                                <li><small>Good</small></li>
+                                <li><small>03-14-26</small></li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3"><small>Cooling / Fan system status</small></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <ul>
+                                <li><small>Fan health</small></li>
+                                <li><small>Fan speed</small></li>
+                                <li><small>System temperature</small></li>
+                            </ul>
+                        </td>
+                        <td>
+                            <ul style="list-style: none;">
+                                <li><small class="green">100%</small></li>
+                                <li><small>600 RPM</small></li>
+                                <li><small>21°C</small></li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3"><small>Power supply status</small></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <ul>
+                                <li><small>Input voltage (V)</small></li>
+                                <li><small>Output voltage stability</small></li>
+                                <li><small>Power usage (W)</small></li>
+                            </ul>
+                        </td>
+                        <td>
+                            <ul style="list-style: none;">
+                                <li><small class="green">223 V</small></li>
+                                <li><small>±2% fluctuation</small></li>
+                                <li><small>450 W Average Load</small></li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">
+                            <h3>Operational Function Test</h3>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <small>UV disinfection test run</small>
+                        </td>
+                        <td>
+                            <button type="button" class="startBtn">Start</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <small>Wax spray level and test</small>
+                        </td>
+                        <td>
+                            <button type="button" class="startBtn">Start</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <small>Coveyor movement test</small>
+                        </td>
+                        <td>
+                            <button type="button" class="startBtn">Start</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <small>Drying performance check</small>
+                        </td>
+                        <td>
+                            <button type="button" class="startBtn">Start</button>
+                        </td>
+                    </tr>
+
+                </table>
+
             </div>
         </div>
 
@@ -197,31 +345,81 @@
             <div class="modal_title">
                 <h1>System Settings</h1>
             </div>
-            <div class="modal_text">
-                <ul>
-                    <li class="enter">
-                        <h3>UV Lamp Settings</h3>
-                        <small>Intensity level</small>
-                        <input type="radio" name="level" id="" checked><small>Low</small> <input type="radio"
-                            name="level" id=""><small>Medium</small> <input type="radio" name="level"
-                            id=""><small>High</small>
-                        <br>
-                        <small>Exposure time (seconds)</small><input type="range" name="" id="time"><small
-                            id="time_text">250s</small><br>
-                    </li>
-                    <li>
-                        <h3>Wax Coating Parameters</h3>
-                        <small>Spray duration and nozzle pressure</small><input type="range" name="" id="spray"><small
-                            id="spray_text">50%</small><br>
-                        <small>Wax solution ratio</small><br>
-                        <small>Drying time control</small><br>
-                    </li>
-                    <li>
-                        <h3>Connectivity</h3>
-                        <small>Wi-fi connection</small>
-                        <small style="color: darkgreen;">Good</small> </h6>
-                    </li>
-                </ul>
+            <div class="modal_text" style="overflow-y: auto; flex: 1;">
+                <table class="table">
+                    <tr>
+
+                        <td colspan="3">
+                            <h3>UV Lamp Settings</h3>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <small>Intensity level</small>
+                        </td>
+                        <td>
+                            <input type="radio" name="level" id="" checked><small>Low</small> <input type="radio"
+                                name="level" id=""><small>Medium</small> <input type="radio" name="level"
+                                id=""><small>High</small>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <small>Exposure time (seconds)</small>
+                        </td>
+                        <td>
+
+                            <input type="range" name="" id="time"><small id="time_text">250s</small>
+                        </td>
+                    </tr>
+                    <tr>
+
+                        <td colspan="3">
+                            <h3>Wax Coating Parameters</h3>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <small>Spray duration and nozzle pressure</small>
+                        </td>
+                        <td>
+                            <input type="range" name="" id="spray"><small id="spray_text">50%</small>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+
+                            <small>Drying time control</small>
+                        </td>
+                        <td>
+
+                            <input type="range" name="" id="waxExposure"><small id="wax_exposure_text">60s</small>
+                        </td>
+                    </tr>
+                    <tr>
+
+                        <td colspan="3">
+                            <h3>Connectivity</h3>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <ul>
+                                <li><small>Wi-fi connection</small></li>
+                            </ul>
+                        </td>
+                        <td>
+                            <ul style="list-style: none;">
+                                <li><small style="color: darkgreen;">Good</small></li>
+                            </ul>
+                        </td>
+                    </tr>
+                </table>
             </div>
         </div>
 
@@ -333,6 +531,12 @@
 
         time.addEventListener("change", function () {
             document.getElementById("time_text").innerHTML = time.value * 5 + 's';
+        });
+
+        const wax_time = document.getElementById("waxExposure");
+
+        wax_time.addEventListener("change", function () {
+            document.getElementById("wax_exposure_text").innerText = wax_time.value + 's';
         });
 
         const spray = document.getElementById("spray");

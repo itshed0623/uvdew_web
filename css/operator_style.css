@@ -551,6 +551,10 @@ footer{
 
 }
 
+.checkup_list{
+    overflow-y: auto;
+}
+
 @media only screen and (max-width: 600px) {
     body{
         min-width: 100%;
