@@ -90,7 +90,7 @@
                     <i class="fa-solid fa-droplet fa-2xl" style="color: #b61b5a;"></i>
                     <h2>Total Processed</h2>
                 </div>
-                <h1>1,245</h1>
+                <h1 id="totalProcessed"></h1>
             </div>
             <div class="processes" id="operator">
                 <i class="fa-solid fa-user fa-2xl" style="color: #b61b5a;"></i>
@@ -107,9 +107,9 @@
             <div class="cont_container admin-control">
                 <h2>System Device Control</h2>
                 <ul>
-                    <li class="control-pill" id="powerBtn">
-                        <i class="fa-solid fa-power-off fa-2xl" style="color: #b61b5a;"></i>
-                        <h4>Power On/Off</h4>
+                    <li id="startContainer" class="control-pill">
+                        <i id="startIcon" class="fa-solid fa-power-off fa-2xl" style="color: #b61b5a;"></i>
+                        <h4 id="start"></h4>
                     </li>
                     <li class="control-pill" id="systemCheckUp">
                         <i class="fa-regular fa-square-check fa-2xl" style="color: #b61b5a;"></i>
@@ -151,10 +151,10 @@
     <div id="power_modal" class="power_modal">
         <div class="modal_content">
             <div class="modal_text power">
-                <h3>Are you sure you want to turn off the device?</h3>
+                <h3>Are you sure you want to turn <span id="onOrOff">off</span> the device?</h3>
             </div>
             <div class="modal_button">
-                <button type="button" class="yesBtn" id="yesBtn">Yes</button>
+                <button type="button" class="yesBtn" id="yesBtn" onclick="powerOn()">Yes</button>
                 <button type="button" class="noBtn" id="noBtn">No</button>
             </div>
         </div>
@@ -188,9 +188,9 @@
                         </td>
                         <td>
                             <ul style="list-style: none;">
-                                <li><small class="green">100%</small></li>
-                                <li><small>ON</small></li>
-                                <li><small>23 hrs</small></li>
+                                <li><small class="green" id="uvIntensityOutput">100%</small></li>
+                                <li><small id="lampStatus">ON</small></li>
+                                <li><small id="lampAge">23 hrs</small></li>
                             </ul>
                         </td>
                     </tr>
@@ -208,8 +208,8 @@
                         </td>
                         <td>
                             <ul style="list-style: none;">
-                                <li><small class="yellow">34°C</small></li>
-                                <li><small>ON</small></li>
+                                <li><small class="yellow" id="conveyorTemperature">34°C</small></li>
+                                <li><small id="conveyorStatus">ON</small></li>
                                 <li><small>67 RPM</small></li>
                             </ul>
                         </td>
@@ -228,9 +228,9 @@
                         </td>
                         <td>
                             <ul style="list-style: none;">
-                                <li><small class="red">130 PSI</small></li>
-                                <li><small>680 ml/min</small></li>
-                                <li><small>Blocked</small></li>
+                                <li><small class="red" id="nozzlePressure">130 PSI</small></li>
+                                <li><small id="flowRate">680 ml/min</small></li>
+                                <li><small id="clogStatus">Blocked</small></li>
                             </ul>
                         </td>
                     </tr>
@@ -248,8 +248,8 @@
                         </td>
                         <td>
                             <ul style="list-style: none;">
-                                <li><small class="green">Ok</small></li>
-                                <li><small>Good</small></li>
+                                <li><small class="green" id="sensorStatus">Ok</small></li>
+                                <li><small id="calibrationStatus">Good</small></li>
                                 <li><small>03-14-26</small></li>
                             </ul>
                         </td>
@@ -268,9 +268,9 @@
                         </td>
                         <td>
                             <ul style="list-style: none;">
-                                <li><small class="green">100%</small></li>
-                                <li><small>600 RPM</small></li>
-                                <li><small>21°C</small></li>
+                                <li><small class="green" id="fanHealth">100%</small></li>
+                                <li><small id="fanSpeed">600 RPM</small></li>
+                                <li><small id="systemTemperature">21°C</small></li>
                             </ul>
                         </td>
                     </tr>
@@ -288,9 +288,9 @@
                         </td>
                         <td>
                             <ul style="list-style: none;">
-                                <li><small class="green">223 V</small></li>
-                                <li><small>±2% fluctuation</small></li>
-                                <li><small>450 W Average Load</small></li>
+                                <li><small class="green" id="inputVoltage">223 V</small></li>
+                                <li><small id="voltageStability">±2% fluctuation</small></li>
+                                <li><small id="powerUsage">450 W Average Load</small></li>
                             </ul>
                         </td>
                     </tr>
@@ -484,16 +484,16 @@
         const back_operator = document.getElementById("back_operator");
 
 
-        document.getElementById("powerBtn").addEventListener("click", function () {
+        document.getElementById("startContainer").addEventListener("click", function () {
             power_modal.style.display = "block";
         });
         noBtn.onclick = function () {
             power_modal.style.display = "none";
         }
 
-        yesBtn.onclick = function (e) {
-            power_modal.style.display = "none";
-        }
+        // yesBtn.onclick = function (e) {
+        //     power_modal.style.display = "none";
+        // }
         document.getElementById("systemCheckUp").addEventListener("click", function () {
             checkup_modal.style.display = "block";
         });
@@ -553,7 +553,7 @@
     <script type="module">
         // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-        import { getDatabase, ref, get, query, orderByChild, equalTo, remove, update }
+        import { getDatabase, ref, get, query, orderByChild, equalTo, remove, update, onValue }
             from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
 
         // TODO: Add SDKs for Firebase products that you want to use
@@ -670,8 +670,120 @@
         // });
 
 
+        const controlData = ref(db, "control");
+
+        // get(usersRef).then((snapshot) => {
+        //     snapshot.forEach((childSnapshot) => {
+        //         const userData = childSnapshot.val();
+
+        //         userData.email.forEach(email => {
+
+        //         });
+        //         console.log(userData.email); // gets each email
+        //     });
+        // });
+
+        // Query users where role is "admin"
+        // const usersRef = ref(db, "users");
+
+
+        onValue(controlData, (snapshot) => {
+
+            if (snapshot.exists()) {
+                // console.log("Data");
+                snapshot.forEach((childSnapshot) => {
+                    const data = childSnapshot.val();
+
+                    const start = data.start;
+                    document.getElementById('totalProcessed').innerHTML = data.totalProcessed;
+                    document.getElementById('uvIntensityOutput').innerHTML = data.uvIntensityOutput;
+                    document.getElementById('lampStatus').innerHTML = data.lampStatus === true ? 'ON' : 'OFF';
+                    document.getElementById('lampAge').innerHTML = data.lampAge + ' hrs';
+                    document.getElementById('conveyorTemperature').innerHTML = data.conveyorTemperature;
+                    document.getElementById('conveyorStatus').innerHTML = data.conveyorStatus === true ? 'ON' : 'OFF';
+                    document.getElementById('nozzlePressure').innerHTML = data.nozzlePressure;
+                    document.getElementById('flowRate').innerHTML = data.flowRate;
+                    document.getElementById('clogStatus').innerHTML = data.clogStatus === true ? 'Blocked' : 'Good';
+                    document.getElementById('sensorStatus').innerHTML = data.sensorStatus === true ? 'Good' : 'Bad';
+                    document.getElementById('calibrationStatus').innerHTML = data.calibrationStatus === true ? 'Good' : 'Bad';
+                    document.getElementById('fanHealth').innerHTML = data.fanHealth + '%';
+                    document.getElementById('fanSpeed').innerHTML = data.fanSpeed = 'RPM';
+                    document.getElementById('systemTemperature').innerHTML = data.systemTemperature + '°C';
+                    document.getElementById('inputVoltage').innerHTML = data.inputVoltage + 'V';
+                    document.getElementById('voltageStability').innerHTML = '±' + data.voltageStability + '% fluctuation';
+                    document.getElementById('powerUsage').innerHTML = data.powerUsage + 'W Average Load';
+
+                    if (start === true) {
+                        document.getElementById("start").innerHTML = "Stop System";
+                        document.getElementById('startContainer').style.border = "2px red solid";
+                        document.getElementById('startIcon').classList.add('startAnimation');
+                        power_modal.style.display = "none";
+                        document.getElementById('onOrOff').innerHTML = 'off';
+
+                    } else {
+                        document.getElementById("start").innerHTML = "Start System";
+                        document.getElementById('startContainer').style.border = "";
+                        document.getElementById('startIcon').classList.remove('startAnimation');
+                        power_modal.style.display = "none";
+                        document.getElementById('onOrOff').innerHTML = 'on';
+                    }
+
+
+                    window.powerOn = function () {
+                        const setStart = ref(db, "control/DeviceOne");
+
+                        if (start === true) {
+                            update(setStart, {
+                                start: false,
+                                uvStart: false,
+                                waxStart: false,
+                            })
+                        } else {
+                            update(setStart, {
+                                start: true
+                            })
+                        }
+                    }
+
+
+                });
+            } else {
+                console.log("No data");
+            }
+
+            // if (snapshot.exists()) {
+            //     snapshot.forEach((childSnapshot) => {
+            //         const data = childSnapshot.val();
+            //         const uid = childSnapshot.key;
+            //         const userEmail = data.email;
+
+            //         console.log(userEmail);
+
+            //         const row = document.createElement("div");
+            //         row.classList.add("control-pill-operator");
+
+            //         row.innerHTML = `
+            //                 <i class="fa-solid fa-user fa-2xl control-item" style="color: #b61b5a;"></i>
+            //                 <div class="control-item-middle">
+            //                     <strong id="username_display">${userEmail}</strong><br>
+            //                     <strong>No. of Processed fruit: <b>27</b></strong><br>
+            //                 </div>
+            //                 <button class="red no-design right control-item delete-user" onclick="deleteUser('${uid}')">Delete</button>
+            //                 <i class="fa-solid fa-trash trash" onclick="deleteUser('${uid}')"></i>
+            //             `;
+
+            //         userList.appendChild(row);
+            //     });
+            // } else {
+            //     console.log("No admin found");
+            // }
+        });
+
 
     </script>
+
+    <!-- <script type="module" src="firebase.js"></script> -->
+
 </body>
 
 </html>

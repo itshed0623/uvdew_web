@@ -390,7 +390,7 @@ section {
     color: var(--heading-color);
     margin: 0 0 20px;
 }
-
+ 
 .progress-wrap{
     display: flex;
     flex-direction: column;
