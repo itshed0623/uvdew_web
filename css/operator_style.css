@@ -395,7 +395,7 @@ section {
     display: flex;
     flex-direction: column;
     gap: 6px;
-    max-width: 360px;
+    max-width: 100%;
 }
 .progress-fill {
     height: 100%;
@@ -553,6 +553,20 @@ footer{
 
 .checkup_list{
     overflow-y: auto;
+}
+
+
+.startAnimation{
+    animation: expand 3s linear forwards infinite;
+}
+
+@keyframes expand{
+    0%{
+        transform: rotate(0);
+    }
+    100%{
+        transform: rotate(360deg);
+    }
 }
 
 @media only screen and (max-width: 600px) {

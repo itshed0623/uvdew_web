@@ -124,7 +124,7 @@
             <div class="report_container admin-control">
                 <h2>Reports and Analytics</h2>
                 <ul>
-                    <li class="control-pill">
+                    <li class="control-pill" onclick="goToReport()">
                         <h4>Daily Report</h4>
                     </li>
                     <li class="control-pill">
@@ -456,6 +456,10 @@
 
         if (loggedin !== "true" || role !== "admin") {
             window.location = "index.html";
+        }
+
+        function goToReport() {
+            window.location = "analytics.html";
         }
     </script>
 

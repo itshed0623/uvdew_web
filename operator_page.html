@@ -27,19 +27,19 @@
             </div>
             <div class="control_container">
                 <ul>
-                    <li class="control-pill" onclick="powerOn()">
-                        <i class="fa-solid fa-power-off fa-2xl" style="color: #b61b5a;"></i>
+                    <li class="control-pill " onclick="powerOn()" id="startContainer">
+                        <i class="fa-solid fa-power-off fa-2xl" style="color: #b61b5a;" id="startIcon"></i>
                         <h4 id="start">Start System</h4>
                     </li>
-                    <li class="control-pill">
-                        <i class="fa-solid fa-lightbulb fa-2xl" style="color: #b61b5a;"></i>
-                        <h4>UV Disinfect</h4>
+                    <li class="control-pill" onclick="uvOn()" id="uvStartContainer">
+                        <i class="fa-solid fa-lightbulb fa-2xl" style="color: #b61b5a;" id="uvStartIcon"></i>
+                        <h4 id="uvStart">UV Disinfect</h4>
                     </li>
-                    <li class="control-pill">
-                        <i class="fa-solid fa-droplet fa-2xl" style="color: #b61b5a;"></i>
+                    <li class="control-pill" onclick="waxOn()" id="waxStartContainer">
+                        <i class="fa-solid fa-droplet fa-2xl" style="color: #b61b5a;" id="waxStartIcon"></i>
                         <h4>Wax Coat</h4>
                     </li>
-                    <li class="control-pill">
+                    <li class="control-pill" onclick="emergency()">
                         <i class="fa-solid fa-circle-stop fa-2xl" style="color: #b61b5a;"></i>
                         <h4>Emergency Stop</h4>
                     </li>
@@ -51,7 +51,7 @@
                 <div class="processName">
                     <h2>UV Intensity</h2>
                     <div class="intensity">
-                        <h1>150</h1>
+                        <h1 id="intensityDisplay">0</h1>
                         <h3>mW/cm<sup>2</sup></h3>
                     </div>
                 </div>
@@ -59,15 +59,15 @@
                     <h2>Wax Coating</h2>
                     <div class="progress-wrap">
                         <div class="progress-track">
-                            <div id="waxBar" class="progress-fill" style="width:35%"></div>
+                            <div id="waxBar" class="progress-fill"></div>
                         </div>
                     </div>
-                    <p>Processing....</p>
+                    <p id="waxBarText"></p>
                 </div>
                 <div class="processName">
                     <h2>Process Timer</h2>
                     <div>
-                        <h1>00:00:00</h1>
+                        <h1 id="processTimer"></h1>
                     </div>
                 </div>
             </div>
@@ -78,7 +78,7 @@
                 <div class="processName">
                     <h2>Temperature</h2>
                     <div class="intensity">
-                        <h1>35</h1>
+                        <h1 id="temperature">0</h1>
                         <h3 class="degree"><sup>o</sup>C</h3>
                     </div>
                 </div>
@@ -204,7 +204,7 @@
         onValue(controlData, (snapshot) => {
 
             if (snapshot.exists()) {
-                console.log("Data");
+                // console.log("Data");
                 snapshot.forEach((childSnapshot) => {
                     const data = childSnapshot.val();
 
@@ -212,10 +212,13 @@
 
                     if (start === true) {
                         document.getElementById("start").innerHTML = "Stop System";
+                        document.getElementById('startContainer').style.border = "2px red solid";
+                        document.getElementById('startIcon').classList.add('startAnimation');
 
                     } else {
                         document.getElementById("start").innerHTML = "Start System";
-
+                        document.getElementById('startContainer').style.border = "";
+                        document.getElementById('startIcon').classList.remove('startAnimation');
                     }
 
 
@@ -224,7 +227,9 @@
 
                         if (start === true) {
                             update(setStart, {
-                                start: false
+                                start: false,
+                                uvStart: false,
+                                waxStart: false,
                             })
                         } else {
                             update(setStart, {
@@ -267,8 +272,216 @@
             // }
         });
 
+        onValue(controlData, (snapshot) => {
+
+            if (snapshot.exists()) {
+                // console.log("Data");
+                snapshot.forEach((childSnapshot) => {
+                    const data = childSnapshot.val();
+
+                    const uvStart = data.uvStart;
+                    const waxStatus = data.uvStart;
+                    const start = data.start;
+
+                    if (uvStart === true && start === true) {
+                        // document.getElementById("uvStart").innerHTML = "Stop System";
+                        document.getElementById('uvStartContainer').style.border = "2px red solid";
+                        document.getElementById('uvStartIcon').classList.add('startAnimation');
+
+                    } else {
+                        // document.getElementById("start").innerHTML = "Start System";
+                        document.getElementById('uvStartContainer').style.border = "";
+                        document.getElementById('uvStartIcon').classList.remove('startAnimation');
+                    }
 
 
+                    window.uvOn = function () {
+                        const setUVStart = ref(db, "control/DeviceOne");
+
+                        if (uvStart === true && start === true) {
+                            update(setUVStart, {
+                                uvStart: false
+                            })
+                        } else {
+                            update(setUVStart, {
+                                uvStart: true
+                            })
+                        }
+                    }
+
+
+                });
+            } else {
+                console.log("No data");
+            }
+        });
+
+        let processT = 0;
+
+        onValue(controlData, (snapshot) => {
+
+            if (snapshot.exists()) {
+                // console.log("Data");
+                snapshot.forEach((childSnapshot) => {
+                    const data = childSnapshot.val();
+
+                    const waxStart = data.waxStart;
+                    const start = data.start;
+                    const hours = data.hours;
+                    const minutes = data.minutes;
+                    const seconds = data.seconds;
+                    document.getElementById('processTimer').innerHTML = processT === 0 ? '00:00:00' : `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(processT).padStart(2, '0')}`;
+
+                    if (waxStart === true && start === true) {
+                        // document.getElementById("uvStart").innerHTML = "Stop System";
+                        document.getElementById('waxStartContainer').style.border = "2px red solid";
+                        document.getElementById('waxStartIcon').classList.add('startAnimation');
+                        document.getElementById('waxBarText').innerHTML = 'Processing....';
+                    } else {
+                        // document.getElementById("start").innerHTML = "Start System";
+                        document.getElementById('waxStartContainer').style.border = "";
+                        document.getElementById('waxStartIcon').classList.remove('startAnimation');
+                        document.getElementById('waxBarText').innerHTML = 'Stopped';
+                    }
+
+
+                    window.waxOn = function () {
+                        const setWaxStart = ref(db, "control/DeviceOne");
+
+                        if (waxStart === true && start === true) {
+                            update(setWaxStart, {
+                                waxStart: false
+                            });
+                        } else {
+                            update(setWaxStart, {
+                                waxStart: true
+                            });
+
+                            // startWaxTime();
+                        }
+                    }
+                });
+            } else {
+                console.log("No data");
+            }
+        });
+
+        onValue(controlData, (snapshot) => {
+
+            if (snapshot.exists()) {
+                // console.log("Data");
+                snapshot.forEach((childSnapshot) => {
+                    const data = childSnapshot.val();
+
+                    const uvStart = data.uvStart;
+                    const start = data.start;
+
+
+                    window.emergency = function () {
+                        const emergency = ref(db, "control/DeviceOne");
+
+                        update(emergency, {
+                            start: false,
+                            uvStart: false,
+                            waxStart: false
+                        });
+                    }
+                });
+            } else {
+                console.log("No data");
+            }
+        });
+
+        onValue(controlData, (snapshot) => {
+            if (snapshot.exists()) {
+                snapshot.forEach((childSnapshot) => {
+                    const data = childSnapshot.val();
+
+                    const intensity = data.uvIntensity;
+                    const temperature = data.temperature;
+
+                    if (temperature && intensity) {
+                        document.getElementById('temperature').innerHTML = temperature;
+                        document.getElementById('intensityDisplay').innerHTML = intensity;
+                    }
+                });
+            }
+        });
+        let time = 0;
+        let waxStatus = false;
+        let timer = null;
+
+        const waxRef = ref(db, 'control/DeviceOne');
+
+        onValue(waxRef, (snapshot) => {
+            if (!snapshot.exists()) return;
+
+            const data = snapshot.val();
+
+            waxStatus = data.waxStart === true;
+
+            handleWaxTimer(); // control logic here
+        });
+
+        function handleWaxTimer() {
+
+            if (waxStatus && timer === null) {
+
+                timer = setInterval(() => {
+                    time++;
+                    processT++;
+                    update(ref(db, 'control/DeviceOne'), {
+                        waxTime: time
+                    });
+                    if (time >= 20) {
+                        clearInterval(timer);
+                        timer = null;
+
+                        time = 0; // ⭐ RESET TIME HERE
+
+                        update(ref(db, 'control/DeviceOne'), {
+                            waxTime: time
+                        });
+                    }
+                }, 1000);
+
+
+            }
+
+            if (!waxStatus && timer !== null) {
+                clearInterval(timer);
+                timer = null;
+
+                time = 0; // ⭐ RESET TIME HERE
+                processT = 0;
+                update(ref(db, 'control/DeviceOne'), {
+                    waxTime: time
+                });
+            }
+        }
+
+        onValue(waxRef, (snapshot) => {
+
+            if (!snapshot.exists()) {
+                console.log("No data");
+                return;
+            }
+
+            const data = snapshot.val();
+
+            const waxStart = data.waxStart;
+            const start = data.start;
+            const getTime = data.waxTime || 0;
+            // console.log(getTime);
+
+            if (waxStart === true && start === true) {
+                console.log('hello')
+                document.getElementById('waxBar').style.width = (getTime * 5) + '%';
+            } else {
+                document.getElementById('waxBar').style.width = '0%';
+            }
+
+        });
 
         // window.deleteUser = function (uid) {
 
