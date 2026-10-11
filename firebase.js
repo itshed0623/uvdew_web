@@ -9,14 +9,14 @@
         // Your web app's Firebase configuration
         // For Firebase JS SDK v7.20.0 and later, measurementId is optional
         const firebaseConfig = {
-            apiKey: "AIzaSyC6A2bCnL6XtYCwxOqysQD6ppbq54T1Nio",
-            authDomain: "uvdew-d94df.firebaseapp.com",
-            databaseURL: "https://uvdew-d94df-default-rtdb.firebaseio.com",
-            projectId: "uvdew-d94df",
-            storageBucket: "uvdew-d94df.firebasestorage.app",
-            messagingSenderId: "525716346378",
-            appId: "1:525716346378:web:5a3bec41e2dc7f718871f3",
-            measurementId: "G-M2ZT1M1E3N"
+            apiKey: "AIzaSyDeeC83zMYqUCQ65qXxHexA9n90y5K-3fU",
+            authDomain: "uvwax-8f837.firebaseapp.com",
+            databaseURL: "https://uvwax-8f837-default-rtdb.firebaseio.com",
+            projectId: "uvwax-8f837",
+            storageBucket: "uvwax-8f837.firebasestorage.app",
+            messagingSenderId: "398816495926",
+            appId: "1:398816495926:web:0be2aa1f749ed68bd2cb97",
+            measurementId: "G-XZ36YCLBLG"
         };
 
         // Initialize Firebase
@@ -25,7 +25,7 @@
         const db = getDatabase();
 
         // const usersRef = ref(db, "users");
-        const controlData = ref(db, "control");
+        const controlData = ref(db, "status");
 
         // get(usersRef).then((snapshot) => {
         //     snapshot.forEach((childSnapshot) => {
@@ -49,7 +49,7 @@
                 snapshot.forEach((childSnapshot) => {
                     const data = childSnapshot.val();
 
-                    const start = data.start;
+                    const start = data.isRunning;
 
                     if (start === true) {
                         document.getElementById("start").innerHTML = "Stop System";
@@ -64,7 +64,7 @@
 
 
                     window.powerOn = function () {
-                        const setStart = ref(db, "control/DeviceOne");
+                        const setStart = ref(db, "status/isRunning");
 
                         if (start === true) {
                             update(setStart, {
