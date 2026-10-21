@@ -232,27 +232,27 @@
             <div class="cards">
                 <div class="card">
                     <h3>Total Today</h3>
-                    <h1 id="todayTotal">--</h1>
+                    <h1 id="todayTotal">0</h1>
                 </div>
                 <div class="card">
                     <h3>UV Disinfected</h3>
-                    <h1 id="todayUV">--</h1>
+                    <h1 id="todayUV">0</h1>
                 </div>
                 <div class="card">
                     <h3>Wax Coated</h3>
-                    <h1 id="todayWax">--</h1>
+                    <h1 id="todayWax">0</h1>
                 </div>
                 <div class="card">
                     <h3>UV Runtime</h3>
-                    <h1 id="uvDailyTime">--</h1>
+                    <h1 id="uvDailyTime">0 min</h1>
                 </div>
                 <div class="card">
                     <h3>Wax Runtime</h3>
-                    <h1 id="waxDailyTime">--</h1>
+                    <h1 id="waxDailyTime">0 min</h1>
                 </div>
                 <div class="card">
                     <h3>Energy Used</h3>
-                    <h1 id="energyDaily">18.5 kWh</h1>
+                    <h1 id="energyDaily">0 kWh</h1>
                 </div>
             </div>
             <div class="charts-grid">
@@ -269,20 +269,20 @@
         <div id="weekly" class="section">
             <div class="cards">
                 <div class="card">
-                    <h3>Total Fruits</h3>
-                    <h1 id="weeklyTotal">4,350</h1>
+                    <h3>Total Fruits (Weekly)</h3>
+                    <h1 id="weeklyTotal">0</h1>
                 </div>
                 <div class="card">
                     <h3>UV Runtime</h3>
-                    <h1>280 min</h1>
+                    <h1 id="uvWeeklyTime">0 min</h1>
                 </div>
                 <div class="card">
                     <h3>Wax Runtime</h3>
-                    <h1>190 min</h1>
+                    <h1 id="waxWeeklyTime">0 min</h1>
                 </div>
                 <div class="card">
                     <h3>Wax Used</h3>
-                    <h1>2.1 L</h1>
+                    <h1 id="waxWeeklyUsed">0 L</h1>
                 </div>
             </div>
             <div class="charts-grid">
@@ -299,20 +299,20 @@
         <div id="monthly" class="section">
             <div class="cards">
                 <div class="card">
-                    <h3>Total Fruits</h3>
-                    <h1 id="monthlyTotal">25,600</h1>
+                    <h3>Total Fruits (Monthly)</h3>
+                    <h1 id="monthlyTotal">0</h1>
                 </div>
                 <div class="card">
                     <h3>UV Runtime</h3>
-                    <h1>19 hrs</h1>
+                    <h1 id="uvMonthlyTime">0 hrs</h1>
                 </div>
                 <div class="card">
                     <h3>Wax Runtime</h3>
-                    <h1>14 hrs</h1>
+                    <h1 id="waxMonthlyTime">0 hrs</h1>
                 </div>
                 <div class="card">
                     <h3>Energy</h3>
-                    <h1>430 kWh</h1>
+                    <h1 id="energyMonthly">0 kWh</h1>
                 </div>
             </div>
             <div class="charts-grid">
@@ -327,7 +327,7 @@
 
     </div>
 
-    <!-- Firebase Realtime Sync & Analytics Logic -->
+    <!-- Firebase Realtime Sync & Aggregated Analytics Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
         import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
@@ -346,6 +346,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase();
         const sensorDataRef = ref(db, "data");
+        const statusDataRef = ref(db, "status");
 
         // Tab switching function
         window.showPage = function (page, btn) {
@@ -359,61 +360,104 @@
         Chart.defaults.font.family = 'Poppins';
         Chart.defaults.color = '#23181a';
 
+        // Base Data Arrays (Defaulting to 0)
+        const dailyVolumes = [0, 0, 0, 0, 0, 0, 0];
+        const uvDaily = [0, 0, 0, 0, 0, 0, 0];
+        const waxDaily = [0, 0, 0, 0, 0, 0, 0];
+
         // Initialize Charts
         const dailyChart = new Chart(document.getElementById('dailyChart'), {
             type: 'line',
-            data: { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], datasets: [{ label: 'Daily Fruit Volume', data: [120, 150, 180, 170, 160, 190, 210], borderColor: '#b61b5a', backgroundColor: 'rgba(182, 27, 90, 0.1)', fill: true, borderWidth: 3, tension: 0.3 }] },
+            data: { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], datasets: [{ label: 'Daily Fruit Volume', data: dailyVolumes, borderColor: '#b61b5a', backgroundColor: 'rgba(182, 27, 90, 0.1)', fill: true, borderWidth: 3, tension: 0.3 }] },
             options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
         });
 
         const dailyRuntimeChart = new Chart(document.getElementById('dailyRuntimeChart'), {
             type: 'bar',
-            data: { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], datasets: [{ label: 'UV Runtime (min)', data: [30, 35, 40, 38, 36, 42, 45], backgroundColor: '#9b0742', borderRadius: 6 }, { label: 'Wax Runtime (min)', data: [20, 25, 28, 27, 26, 29, 30], backgroundColor: '#d79eb1', borderRadius: 6 }] },
+            data: { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], datasets: [{ label: 'UV Runtime (min)', data: uvDaily, backgroundColor: '#9b0742', borderRadius: 6 }, { label: 'Wax Runtime (min)', data: waxDaily, backgroundColor: '#d79eb1', borderRadius: 6 }] },
             options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
         });
 
-        new Chart(document.getElementById('weeklyChart'), {
+        const weeklyChart = new Chart(document.getElementById('weeklyChart'), {
             type: 'bar',
-            data: { labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'], datasets: [{ label: 'Weekly Fruit Volume', data: [980, 1020, 1100, 1250], backgroundColor: '#b61b5a', borderRadius: 8 }] },
+            data: { labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'], datasets: [{ label: 'Weekly Fruit Volume', data: [0, 0, 0, 0], backgroundColor: '#b61b5a', borderRadius: 8 }] },
             options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
         });
 
-        new Chart(document.getElementById('weeklyRuntimeChart'), {
+        const weeklyRuntimeChart = new Chart(document.getElementById('weeklyRuntimeChart'), {
             type: 'bar',
-            data: { labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'], datasets: [{ label: 'UV Runtime', data: [60, 70, 75, 80], backgroundColor: '#9b0742', borderRadius: 6 }, { label: 'Wax Runtime', data: [45, 50, 48, 47], backgroundColor: '#d79eb1', borderRadius: 6 }] },
+            data: { labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'], datasets: [{ label: 'UV Runtime (min)', data: [0, 0, 0, 0], backgroundColor: '#9b0742', borderRadius: 6 }, { label: 'Wax Runtime (min)', data: [0, 0, 0, 0], backgroundColor: '#d79eb1', borderRadius: 6 }] },
             options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
         });
 
-        new Chart(document.getElementById('monthlyChart'), {
+        const monthlyChart = new Chart(document.getElementById('monthlyChart'), {
             type: 'line',
-            data: { labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], datasets: [{ label: 'Monthly Fruit Volume', data: [4200, 4500, 4700, 5200, 5600, 6100], borderColor: '#b61b5a', backgroundColor: 'rgba(182, 27, 90, 0.1)', fill: true, borderWidth: 3, tension: 0.3 }] },
+            data: { labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], datasets: [{ label: 'Monthly Fruit Volume', data: [0, 0, 0, 0, 0, 0], borderColor: '#b61b5a', backgroundColor: 'rgba(182, 27, 90, 0.1)', fill: true, borderWidth: 3, tension: 0.3 }] },
             options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
         });
 
-        new Chart(document.getElementById('monthlyRuntimeChart'), {
+        const monthlyRuntimeChart = new Chart(document.getElementById('monthlyRuntimeChart'), {
             type: 'line',
-            data: { labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], datasets: [{ label: 'UV Runtime', data: [260, 280, 300, 320, 340, 360], borderColor: '#9b0742', borderWidth: 2, tension: 0.3 }, { label: 'Wax Runtime', data: [190, 210, 220, 230, 240, 260], borderColor: '#cb6499', borderWidth: 2, tension: 0.3 }] },
+            data: { labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], datasets: [{ label: 'UV Runtime (hrs)', data: [0, 0, 0, 0, 0, 0], borderColor: '#9b0742', borderWidth: 2, tension: 0.3 }, { label: 'Wax Runtime (hrs)', data: [0, 0, 0, 0, 0, 0], borderColor: '#cb6499', borderWidth: 2, tension: 0.3 }] },
             options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
         });
 
-        // Sync Real-Time Firebase Telemetry (`fruitCount`) into Today's Analytics
+        // Sync Real-Time Firebase Telemetry (`data` and `status`) with 0-fallback handling
         onValue(sensorDataRef, (snapshot) => {
+            let currentFruitCount = 0;
+
             if (snapshot.exists()) {
                 const telemetry = snapshot.val();
-                const currentFruitCount = telemetry.fruitCount !== undefined ? telemetry.fruitCount : 0;
-
-                // Update text elements with live count
-                document.getElementById('todayTotal').innerText = currentFruitCount;
-                document.getElementById('todayUV').innerText = Math.round(currentFruitCount * 0.6);
-                document.getElementById('todayWax').innerText = Math.round(currentFruitCount * 0.4);
-                document.getElementById('uvDailyTime').innerText = `${Math.round(currentFruitCount * 0.25)} min`;
-                document.getElementById('waxDailyTime').innerText = `${Math.round(currentFruitCount * 0.15)} min`;
-
-                // Dynamically update today's last data point on the Daily Volume chart
-                const dailyData = dailyChart.data.datasets[0].data;
-                dailyData[dailyData.length - 1] = currentFruitCount;
-                dailyChart.update();
+                currentFruitCount = telemetry.fruitCount !== undefined && telemetry.fruitCount !== null ? Number(telemetry.fruitCount) : 0;
             }
+
+            // 1. Update Daily Metrics with 0 fallback
+            document.getElementById('todayTotal').innerText = currentFruitCount;
+            document.getElementById('todayUV').innerText = Math.round(currentFruitCount * 0.6);
+            document.getElementById('todayWax').innerText = Math.round(currentFruitCount * 0.4);
+            document.getElementById('uvDailyTime').innerText = `${Math.round(currentFruitCount * 0.25)} min`;
+            document.getElementById('waxDailyTime').innerText = `${Math.round(currentFruitCount * 0.15)} min`;
+            document.getElementById('energyDaily').innerText = `${(currentFruitCount * 0.08).toFixed(1)} kWh`;
+
+            // Update today's entry on Daily chart
+            dailyVolumes[dailyVolumes.length - 1] = currentFruitCount;
+            uvDaily[uvDaily.length - 1] = Math.round(currentFruitCount * 0.25);
+            waxDaily[waxDaily.length - 1] = Math.round(currentFruitCount * 0.15);
+
+            dailyChart.data.datasets[0].data = dailyVolumes;
+            dailyChart.update();
+
+            dailyRuntimeChart.data.datasets[0].data = uvDaily;
+            dailyRuntimeChart.data.datasets[1].data = waxDaily;
+            dailyRuntimeChart.update();
+
+            // 2. Integrate Daily Data into Weekly View
+            const currentWeekTotal = dailyVolumes.reduce((a, b) => a + b, 0);
+            const currentWeekUVTime = uvDaily.reduce((a, b) => a + b, 0);
+            const currentWeekWaxTime = waxDaily.reduce((a, b) => a + b, 0);
+
+            document.getElementById('weeklyTotal').innerText = currentWeekTotal;
+            document.getElementById('uvWeeklyTime').innerText = `${currentWeekUVTime} min`;
+            document.getElementById('waxWeeklyTime').innerText = `${currentWeekWaxTime} min`;
+            document.getElementById('waxWeeklyUsed').innerText = `${(currentWeekTotal * 0.0005).toFixed(2)} L`;
+
+            const weeklyData = weeklyChart.data.datasets[0].data;
+            weeklyData[weeklyData.length - 1] = currentWeekTotal;
+            weeklyChart.update();
+
+            // 3. Integrate Weekly Data into Monthly View
+            const currentMonthTotal = currentWeekTotal;
+            const totalUVHours = (currentWeekUVTime / 60).toFixed(1);
+            const totalWaxHours = (currentWeekWaxTime / 60).toFixed(1);
+
+            document.getElementById('monthlyTotal').innerText = currentMonthTotal;
+            document.getElementById('uvMonthlyTime').innerText = `${totalUVHours} hrs`;
+            document.getElementById('waxMonthlyTime').innerText = `${totalWaxHours} hrs`;
+            document.getElementById('energyMonthly').innerText = `${(currentMonthTotal * 0.08).toFixed(1)} kWh`;
+
+            const monthlyData = monthlyChart.data.datasets[0].data;
+            monthlyData[monthlyData.length - 1] = currentMonthTotal;
+            monthlyChart.update();
         });
     </script>
 

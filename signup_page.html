@@ -4,10 +4,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Signup</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <link rel="stylesheet" href="./css/style.css">
     <link rel="shortcut icon" href="./images/623706670_933528319068570_7706221529996436771_n.png" type="image/x-icon">
+    <style>
+        .pill {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+    </style>
 </head>
 
 <body>
@@ -21,15 +28,11 @@
         </div>
         <form action="" class="form_group">
             <div class="pill">
-                <input type="text" id="username" required>
-                <label for="username" class="username">Username</label>
+                <input type="text" id="username" placeholder=" " required>
+                <label for="username" class="username">Username or Email</label>
             </div>
             <div class="pill">
-                <input type="text" id="role" required>
-                <label for="role" class="role">Role</label>
-            </div>
-            <div class="pill">
-                <input type="password" id="password" minlength="8" required>
+                <input type="password" id="password" minlength="8" placeholder=" " required>
                 <label for="password">Password</label>
                 <button type="button" class="eye-btn" onclick="togglePassword()">
                     <svg id="eye-open" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22"
@@ -43,10 +46,9 @@
                         <path d="M1 1l22 22" />
                     </svg>
                 </button>
-
             </div>
             <div class="pill">
-                <input type="password" id="password_confirm" minlength="8" required>
+                <input type="password" id="password_confirm" minlength="8" placeholder=" " required>
                 <label for="password_confirm">Confirm Password</label>
                 <button type="button" class="eye-btn" onclick="toggleConfirmPassword()">
                     <svg id="eye-open-con" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22"
@@ -60,7 +62,6 @@
                         <path d="M1 1l22 22" />
                     </svg>
                 </button>
-
             </div>
             <div class="signupBtn">
                 <p>Already have an account? <a href="./index.html">Login</a></p>
@@ -79,12 +80,13 @@
                 password.type = 'text';
                 open.style.display = 'none';
                 close.style.display = 'inline';
-            } else if (password.type === 'text') {
+            } else {
                 password.type = 'password';
                 open.style.display = 'inline';
                 close.style.display = 'none';
             }
         }
+
         function toggleConfirmPassword() {
             const password = document.getElementById('password_confirm');
             const open = document.getElementById('eye-open-con');
@@ -94,26 +96,19 @@
                 password.type = 'text';
                 open.style.display = 'none';
                 close.style.display = 'inline';
-            } else if (password.type === 'text') {
+            } else {
                 password.type = 'password';
                 open.style.display = 'inline';
                 close.style.display = 'none';
             }
         }
     </script>
+
     <script type="module">
-        // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
-        import { getDatabase, ref, get, set }
-            from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+        import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 
-        // TODO: Add SDKs for Firebase products that you want to use
-        // https://firebase.google.com/docs/web/setup#available-libraries
-
-        // Your web app's Firebase configuration
-        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
         const firebaseConfig = {
             apiKey: "AIzaSyDeeC83zMYqUCQ65qXxHexA9n90y5K-3fU",
             authDomain: "uvwax-8f837.firebaseapp.com",
@@ -125,56 +120,52 @@
             measurementId: "G-XZ36YCLBLG"
         };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
-        const db = getDatabase();
-
-        const auth = getAuth();
+        const db = getDatabase(app);
+        const auth = getAuth(app);
 
         const form = document.querySelector(".form_group");
 
         form.addEventListener("submit", function (e) {
             e.preventDefault();
             signUp();
-        })
+        });
 
-        function signUp() {
-            const username = document.getElementById('username').value;
-            const role = document.getElementById('role').value;
+        async function signUp() {
+            let usernameInput = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value;
+            const passwordConfirm = document.getElementById('password_confirm').value;
+            const constantRole = "operator";
 
-            createUserWithEmailAndPassword(auth, username, password)
-                .then((userCredential) => {
+            if (password !== passwordConfirm) {
+                alert("Passwords do not match!");
+                return;
+            }
 
-                    const user = userCredential.user;
+            // Ensure valid email format for Firebase Auth
+            let email = usernameInput;
+            if (!email.includes("@")) {
+                email = `${usernameInput}@gmail.com`;
+            }
 
-                    set(ref(db, "users/" + user.uid), {
-                        email: username,
-                        role: role
-                    });
+            try {
+                // 1. Create User in Firebase Auth
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
 
-                    alert("Registered Successfully!");
-                    // alert('Login Successfully');
-                    // window.location = "operator_page.html";
-                })
-                .catch(error => {
-                    alert(error.message);
-                })
+                // 2. Store user record in Realtime Database under users/{uid}
+                await set(ref(db, "users/" + user.uid), {
+                    email: email,
+                    role: constantRole
+                });
+
+                alert("Registered Successfully as Operator!");
+                window.location = "index.html";
+            } catch (error) {
+                console.error("Signup error:", error);
+                alert(error.message);
+            }
         }
-        // const db = getDatabase(app);
-        // const studentRef = ref(db, "students");
-        // get(studentRef).then((snapshot) => {
-        //     if (snapshot.exists()) {
-        //         console.log(snapshot.val());
-        //     } else {
-        //         console.log("No data available");
-        //     }
-        // }).catch((error) => {
-        //     console.error(error);
-        // });
-
-
     </script>
 </body>
 
