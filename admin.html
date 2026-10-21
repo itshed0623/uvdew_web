@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UVDEW - Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="./css/admin.css">
+    <link rel="shortcut icon" href="./images/623706670_933528319068570_7706221529996436771_n.png" type="image/x-icon">
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 50%, #f472b6 100%);
+            --card-bg: rgba(255, 255, 255, 0.75);
+            --card-border: rgba(255, 255, 255, 0.8);
+            --text-dark: #1e293b;
+            --accent-pink: #9d174d;
+            --accent-hover: #831843;
+            --shadow: 0 10px 25px -5px rgba(157, 23, 77, 0.1);
+        }
+
+        body {
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            color: var(--text-dark);
+            margin: 0;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            padding: 12px 24px;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+
+        .operator-card-item {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 14px 18px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+        }
+
+        .dismiss-btn {
+            background: rgba(0, 0, 0, 0.08);
+            border: none;
+            padding: 4px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .dismiss-btn:hover {
+            background: rgba(0, 0, 0, 0.15);
+        }
+
+        /* Manual Controls Section */
+        .manual-controls {
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .manual-controls h4 {
+            color: var(--heading-color);
+            margin: 0 0 16px 0;
+            font-size: 1rem;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 16px;
+            font-size: 0.9rem;
+        }
+
+        .slider {
+            accent-color: var(--accent);
+            width: 100%;
+            cursor: pointer;
+        }
+
+        /* Switch Toggle Styling */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 46px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider-toggle {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider-toggle:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider-toggle {
+            background-color: var(--accent);
+        }
+
+        input:checked+.slider-toggle:before {
+            transform: translateX(22px);
+        }
+
+
+
+        .operator-info {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .operator-info i {
+            font-size: 1.8rem;
+            color: var(--accent-pink);
+        }
+
+        .operator-details strong {
+            font-size: 1rem;
+            color: var(--text-dark);
+        }
+
+        .operator-details small {
+            display: block;
+            color: #64748b;
+            font-size: 0.8rem;
+        }
+
+        .delete-user-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.82rem;
+            transition: background 0.2s;
+        }
+
+        .delete-user-btn:hover {
+            background: #dc2626;
+        }
+
+        .user_header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo {
+            height: 42px;
+            width: auto;
+        }
+
+        .summary-bar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .summary-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            padding: 16px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            box-shadow: var(--shadow);
+        }
+
+        .summary-card i {
+            font-size: 1.8rem;
+            color: var(--accent-pink);
+        }
+
+        .admin-layout-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .dashboard-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            border-radius: 18px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .metric-box {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+        }
+
+        .metric-box h1 {
+            margin: 8px 0 0;
+            font-size: 2.2rem;
+            color: var(--accent-pink);
+        }
+
+        .metric-box h2 {
+            font-size: 0.95rem;
+            margin: 0;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .uv-wax-side-by-side {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .progress-wrap {
+            background: #e2e8f0;
+            height: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            background: var(--accent-pink);
+            height: 100%;
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        .control-pill {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            padding: 12px 16px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .control-pill:hover {
+            background: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .control-pill i {
+            color: var(--accent-pink);
+        }
+
+        /* Dynamic alerts & log scroll styling */
+        .dynamic-alert-list {
+            max-height: 160px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .alert-item-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.88rem;
+        }
+
+        .alert-item-card.warning {
+            background: #fef2f2;
+            border-left: 4px solid #ef4444;
+            color: #991b1b;
+        }
+
+        .alert-item-card.success {
+            background: #f0fdf4;
+            border-left: 4px solid #22c55e;
+            color: #166534;
+        }
+
+        .alert-item-card.info {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            color: #1e40af;
+        }
+
+        .activity-scroll-container {
+            max-height: 200px;
+            overflow-y: auto;
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 8px;
+        }
+
+        .activity-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+        }
+
+        .activity-table th,
+        .activity-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .badge.success {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .badge.info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        @media (max-width: 1024px) {
+            .admin-layout-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="user_header">
+            <img src="./images/623706670_933528319068570_7706221529996436771_n.png" alt="UVDEW Logo" class="logo">
+            <div>
+                <h3 style="margin: 0; font-size: 1.2rem;">Admin Control Portal</h3>
+                <span style="color: #16a34a; font-size: 0.8rem; font-weight: 600;"><i class="fa-solid fa-circle"
+                        style="font-size: 0.5rem;"></i> Administrator Mode</span>
+            </div>
+        </div>
+        <div>
+            <button type="button" id="logoutBtn" class="logoutBtn"
+                style="background: var(--accent-pink); color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                <i class="fa-solid fa-right-from-bracket"></i> Logout
+            </button>
+        </div>
+    </header>
+
+    <!-- Diagnostics Bar -->
+    <section class="summary-bar-grid">
+        <div class="summary-card">
+            <i class="fa-solid fa-microchip"></i>
+            <div>
+                <span style="font-size: 0.8rem; color: #64748b;">PLC Connection</span>
+                <h4 style="margin: 0; color: #16a34a;">Connected</h4>
+            </div>
+        </div>
+        <div class="summary-card">
+            <i class="fa-solid fa-boxes-stacked"></i>
+            <div>
+                <span style="font-size: 0.8rem; color: #64748b;">Active Batch</span>
+                <h4 id="currentBatch" style="margin: 0;">#BATCH-2026-042</h4>
+            </div>
+        </div>
+        <div class="summary-card">
+            <i class="fa-solid fa-apple-whole"></i>
+            <div>
+                <span style="font-size: 0.8rem; color: #64748b;">Produce Type</span>
+                <h4 style="margin: 0;">Dragon Fruit</h4>
+            </div>
+        </div>
+        <div class="summary-card">
+            <i class="fa-solid fa-gauge-high"></i>
+            <div>
+                <span style="font-size: 0.8rem; color: #64748b;">Items Processed</span>
+                <h4 id="processedCount" style="margin: 0;">0 units</h4>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Grid Layout -->
+    <div class="admin-layout-grid">
+        <!-- Left Column -->
+        <div class="dashboard-card">
+            <div class="metric-box">
+                <h2><i class="fa-solid fa-droplet" style="color: var(--accent-pink);"></i> Total Processed</h2>
+                <h1 id="totalProcessed">0</h1>
+            </div>
+
+            <div class="metric-box" id="operator" style="cursor: pointer; transition: transform 0.2s;"
+                onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+                <h2><i class="fa-solid fa-users" style="color: var(--accent-pink);"></i> List of Operators</h2>
+                <small style="color: #64748b; font-weight: 600;">Manage Accounts</small>
+            </div>
+
+            <div class="metric-box" style="margin-top: auto;">
+                <h2><i class="fa-solid fa-stopwatch" style="color: var(--accent-pink);"></i> Process Timer</h2>
+                <h1 id="processTimer" style="font-size: 2rem;">00:00:00</h1>
+            </div>
+
+            <div class="dashboard-card">
+                <h3 style="margin: 0 0 10px; font-size: 1.05rem; color: var(--accent-pink);">System Device Control</h3>
+                <div class="control-pill" onclick="powerOn()" id="startContainer">
+                    <i id="startIcon" class="fa-solid fa-power-off fa-lg"></i>
+                    <span id="start">Start System</span>
+                </div>
+                <div class="control-pill" id="systemCheckUp">
+                    <i class="fa-regular fa-square-check fa-lg"></i>
+                    <span>System Checkup</span>
+                </div>
+                <div class="control-pill" id="systemSetting">
+                    <i class="fa-solid fa-gears fa-lg"></i>
+                    <span>System Settings</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Center Column -->
+        <div class="dashboard-card">
+            <div class="uv-wax-side-by-side">
+                <div class="metric-box">
+                    <h2>UV Intensity</h2>
+                    <h1><span id="intensityDisplay">0</span> <small
+                            style="font-size: 0.9rem; color: #64748b;">mW/cm²</small></h1>
+                </div>
+                <div class="metric-box">
+                    <h2>Wax Percent</h2>
+                    <h1><span id="waxPercentDisplay">0</span> <small
+                            style="font-size: 0.9rem; color: #64748b;">%</small></h1>
+                </div>
+            </div>
+
+            <div class="metric-box" style="text-align: left;">
+                <h2 style="justify-content: flex-start;">Wax Coating Progress</h2>
+                <div class="progress-wrap">
+                    <div id="waxBar" class="progress-fill"></div>
+                </div>
+                <small id="waxBarText"
+                    style="display: block; text-align: right; margin-top: 6px; font-weight: 600; color: #64748b;">0%
+                    Completed</small>
+            </div>
+
+            <div class="metric-box" style="margin-top: auto;">
+                <h2>System Temperature</h2>
+                <h1><span id="temperature">28</span> <small style="font-size: 1.1rem; color: #64748b;">°C</small></h1>
+            </div>
+
+            <div class="dashboard-card">
+                <h3 style="margin: 0 0 10px; font-size: 1.05rem; color: var(--accent-pink);">Reports & Analytics</h3>
+                <div class="control-pill" onclick="goToReport()">
+                    <i class="fa-solid fa-chart-line fa-lg"></i>
+                    <span>Daily Report</span>
+                </div>
+                <div class="control-pill">
+                    <i class="fa-solid fa-calendar-week fa-lg"></i>
+                    <span>Weekly Report</span>
+                </div>
+                <div class="control-pill">
+                    <i class="fa-solid fa-calendar-days fa-lg"></i>
+                    <span>Monthly Report</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Live System Alerts Section -->
+    <div class="dashboard-card" style="margin-top: 20px;">
+        <h3 style="margin: 0 0 10px; font-size: 1.05rem; color: var(--accent-pink);">Live System Alerts</h3>
+        <div id="dynamicAlertList" class="dynamic-alert-list"></div>
+    </div>
+
+    <!-- Recent System Activity Section -->
+    <div class="dashboard-card" style="margin-top: 20px;">
+        <h3 style="margin: 0 0 10px; font-size: 1.05rem; color: var(--accent-pink);">Recent System Activity</h3>
+        <div class="activity-scroll-container">
+            <table class="activity-table">
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Event Description</th>
+                        <th>Operator / Source</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="activityLogBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="power_modal" class="power_modal">
+        <div class="modal_content">
+            <div class="modal_title">
+                <h1>Power Switch</h1>
+            </div>
+            <div class="modal_text" style="text-align: center;">
+                <h3>Are you sure you want to turn <span id="onOrOff">off</span> the device?</h3>
+            </div>
+            <div class="modal_button">
+                <button type="button" class="yesBtn" id="yesBtn" onclick="powerOn()">Yes</button>
+                <button type="button" class="noBtn" id="noBtn">No</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="checkup_modal" class="checkup_modal">
+        <div class="modal_content_checkup">
+            <i class="fa-solid fa-arrow-left-long" id="back_check"
+                style="cursor: pointer; font-size: 1.2rem; color: var(--accent-pink); margin-bottom: 10px;"></i>
+            <div class="modal_title">
+                <h1>System Check Up</h1>
+            </div>
+            <div class="modal_text">
+                <table class="table">
+                    <tr>
+                        <td colspan="3">
+                            <h3>Hardware Health Status</h3>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3"><small>UV lamp condition / intensity health</small></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>
+                            <ul>
+                                <li><small>UV intensity Output</small></li>
+                                <li><small>Lamp status</small></li>
+                                <li><small>Lamp age</small></li>
+                            </ul>
+                        </td>
+                        <td>
+                            <ul style="list-style: none;">
+                                <li><small class="green" id="uvIntensityOutput">100%</small></li>
+                                <li><small id="lampStatus">ON</small></li>
+                                <li><small id="lampAge">23 hrs</small></li>
+                            </ul>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="setting_modal" class="setting_modal">
+        <div class="modal_content_settings">
+            <i class="fa-solid fa-arrow-left-long" id="back_setting"
+                style="cursor: pointer; font-size: 1.2rem; color: var(--accent-pink); margin-bottom: 10px;"></i>
+            <div class="modal_title">
+                <h1>System Settings</h1>
+            </div>
+            <div class="modal_text">
+
+                <div class="dashboard-card">
+                    <table class="table">
+                        <tr>
+                            <td colspan="3">
+                                <h3>UV Lamp Settings</h3>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td><small>Intensity level</small></td>
+                            <td>
+                                <input type="radio" name="level" checked><small>Low</small>
+                                <input type="radio" name="level"><small>Medium</small>
+                                <input type="radio" name="level"><small>High</small>
+                            </td>
+                        </tr>
+                    </table>
+                    <h3 style="margin: 0 0 10px; font-size: 1.05rem; color: var(--accent-pink);">Manual Adjustments</h3>
+                    <div class="control-group">
+                        <label style="font-size: 0.85rem; font-weight: 600; color: #475569;">Conveyor Speed (<span
+                                id="speedVal">60</span> RPM)</label>
+                        <input type="range" id="speedRange" min="0" max="60" value="60"
+                            style="width: 100%; margin-top: 6px;" oninput="updateConveyorSpeed(this.value)">
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                        <label style="font-size: 0.85rem; font-weight: 600; color: #475569;">Air Dryer Blower</label>
+                        <label class="switch">
+                            <input type="checkbox" id="fanToggle" onchange="updateFanToggle(this.checked)">
+                            <span class="slider-toggle round"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="operator_modal" class="operator_modal">
+        <div class="modal_content_operator">
+            <i class="fa-solid fa-arrow-left-long" id="back_operator"
+                style="cursor: pointer; font-size: 1.2rem; color: var(--accent-pink); margin-bottom: 10px;"></i>
+            <div class="modal_title">
+                <h1>Registered Operators</h1>
+            </div>
+            <div id="user-list" class="modal_text" style="margin-top: 15px;">
+                <!-- Dynamically populated from Realtime Database -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        const loggedin = localStorage.getItem("loggedin");
+        const role = localStorage.getItem("role");
+
+        if (loggedin !== "true" || role !== "admin") {
+            window.location = "index.html";
+        }
+
+        function goToReport() {
+            window.location = "analytics.html";
+        }
+
+        const logoutBtn = document.getElementById("logoutBtn");
+        logoutBtn.onclick = function () {
+            localStorage.removeItem("loggedin");
+            localStorage.removeItem("username");
+            localStorage.removeItem("role");
+            window.location = "index.html";
+        }
+
+        const power_modal = document.getElementById("power_modal");
+        const checkup_modal = document.getElementById("checkup_modal");
+        const setting_modal = document.getElementById("setting_modal");
+        const operator_modal = document.getElementById("operator_modal");
+        const noBtn = document.getElementById("noBtn");
+        const back_check = document.getElementById("back_check");
+        const back_setting = document.getElementById("back_setting");
+        const back_operator = document.getElementById("back_operator");
+
+        document.getElementById("systemCheckUp").addEventListener("click", () => checkup_modal.style.display = "flex");
+        document.getElementById("systemSetting").addEventListener("click", () => setting_modal.style.display = "flex");
+        document.getElementById("operator").addEventListener("click", () => operator_modal.style.display = "flex");
+
+        if (noBtn) noBtn.onclick = () => power_modal.style.display = "none";
+        if (back_check) back_check.onclick = () => checkup_modal.style.display = "none";
+        if (back_setting) back_setting.onclick = () => setting_modal.style.display = "none";
+        if (back_operator) back_operator.onclick = () => operator_modal.style.display = "none";
+
+        window.onclick = function (e) {
+            if (e.target == checkup_modal) checkup_modal.style.display = "none";
+            else if (e.target == power_modal) power_modal.style.display = "none";
+            else if (e.target == setting_modal) setting_modal.style.display = "none";
+            else if (e.target == operator_modal) operator_modal.style.display = "none";
+        }
+    </script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+        import { getDatabase, ref, get, query, orderByChild, equalTo, remove, update, onValue }
+            from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDeeC83zMYqUCQ65qXxHexA9n90y5K-3fU",
+            authDomain: "uvwax-8f837.firebaseapp.com",
+            databaseURL: "https://uvwax-8f837-default-rtdb.firebaseio.com",
+            projectId: "uvwax-8f837",
+            storageBucket: "uvwax-8f837.firebasestorage.app",
+            messagingSenderId: "398816495926",
+            appId: "1:398816495926:web:0be2aa1f749ed68bd2cb97",
+            measurementId: "G-XZ36YCLBLG"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase();
+        const usersRef = ref(db, "users");
+        const userList = document.getElementById("user-list");
+        const adminQuery = query(usersRef, orderByChild("role"), equalTo("operator"));
+
+        // Dynamically fetch and display all Operator accounts from Firebase /users
+        const allUsersRef = ref(db, "users");
+        const userListContainer = document.getElementById("user-list");
+
+        onValue(allUsersRef, (snapshot) => {
+            if (!userListContainer) return;
+            userListContainer.innerHTML = "";
+
+            if (snapshot.exists()) {
+                let operatorCount = 0;
+                snapshot.forEach((childSnapshot) => {
+                    const uid = childSnapshot.key;
+                    const userData = childSnapshot.val();
+
+                    if (userData && userData.role === "operator") {
+                        operatorCount++;
+                        const userCard = document.createElement("div");
+                        userCard.className = "operator-card-item";
+                        userCard.innerHTML = `
+                            <div class="operator-info">
+                                <i class="fa-solid fa-user-gear"></i>
+                                <div class="operator-details">
+                                    <strong>${userData.email || "Operator User"}</strong>
+                                    <small>Role: Operator | UID: ${uid.substring(0, 8)}...</small>
+                                </div>
+                            </div>
+                            <button class="delete-user-btn" onclick="deleteUser('${uid}')">Delete</button>
+                        `;
+                        userListContainer.appendChild(userCard);
+                    }
+                });
+
+                if (operatorCount === 0) {
+                    userListContainer.innerHTML = `<div style="text-align: center; color: #64748b; padding: 20px;">No operator accounts found.</div>`;
+                }
+            } else {
+                userListContainer.innerHTML = `<div style="text-align: center; color: #64748b; padding: 20px;">No users found.</div>`;
+            }
+        });
+
+        window.deleteUser = function (uid) {
+            if (confirm("Are you sure you want to delete this operator account?")) {
+                const userRef = ref(db, "users/" + uid);
+                remove(userRef).then(() => {
+                    alert("Operator account deleted successfully.");
+                }).catch((error) => {
+                    console.error("Delete failed:", error);
+                    alert("Failed to delete user account.");
+                });
+            }
+        };
+
+        get(adminQuery).then((snapshot) => {
+            if (userList) userList.innerHTML = "";
+            if (snapshot.exists()) {
+                snapshot.forEach((childSnapshot) => {
+                    const data = childSnapshot.val();
+                    const uid = childSnapshot.key;
+                    const userEmail = data.email;
+
+                    const row = document.createElement("div");
+                    row.classList.add("control-pill-operator");
+                    row.innerHTML = `
+                        <i class="fa-solid fa-user fa-2xl control-item" style="color: var(--accent-pink);"></i>
+                        <div class="control-item-middle">
+                            <strong id="username_display">${userEmail}</strong><br>
+                            <small>Operator Account</small>
+                        </div>
+                        <button class="red no-design right control-item delete-user" onclick="deleteUser('${uid}')" style="background:#ef4444; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer;">Delete</button>
+                    `;
+                    if (userList) userList.appendChild(row);
+                });
+            }
+        });
+
+        window.deleteUser = function (uid) {
+            if (confirm("Delete this user?")) {
+                const userRef = ref(db, "users/" + uid);
+                update(userRef, { role: "deleted" }).then(() => {
+                    alert("User deleted");
+                    location.reload();
+                });
+            }
+        }
+
+        const controlData = ref(db, "status");
+        const sensorDataRef = ref(db, "data");
+
+        let currentIsRunning = 0;
+        let currentIsUvRunning = 0;
+        let currentIsWaxRunning = 0;
+        let currentUvIndex = 0;
+        let currentTemp = 28;
+        let currentWaxPercent = 0;
+
+        const dismissedAlerts = new Set();
+        const activityLogs = [];
+
+        function logActivity(description, source = "Admin", statusType = "success", statusText = "Active") {
+            const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            activityLogs.unshift({ time: timeStr, desc: description, source, statusType, statusText });
+            if (activityLogs.length > 25) activityLogs.pop();
+            renderActivityLog();
+        }
+
+        function renderActivityLog() {
+            const tbody = document.getElementById("activityLogBody");
+            if (!tbody) return;
+            tbody.innerHTML = "";
+            activityLogs.forEach(item => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td>${item.time}</td>
+                    <td>${item.desc}</td>
+                    <td>${item.source}</td>
+                    <td><span class="badge ${item.statusType}">${item.statusText}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        const today = new Date();
+        const generatedBatchName = `#BATCH-${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+        if (document.getElementById("currentBatch")) {
+            document.getElementById("currentBatch").innerText = generatedBatchName;
+        }
+
+        let waxInterval = null;
+        let currentProgress = 0;
+
+        function startWaxLoop() {
+            if (waxInterval) return;
+            waxInterval = setInterval(() => {
+                currentProgress += 10;
+                if (currentProgress > 100) currentProgress = 0;
+                const waxBar = document.getElementById("waxBar");
+                const waxBarText = document.getElementById("waxBarText");
+                if (waxBar) waxBar.style.width = currentProgress + "%";
+                if (waxBarText) waxBarText.innerText = currentProgress + "% Completed";
+            }, 100);
+        }
+
+        function stopWaxLoop(fallbackPercent = 0) {
+            if (waxInterval) {
+                clearInterval(waxInterval);
+                waxInterval = null;
+            }
+            const waxBar = document.getElementById("waxBar");
+            const waxBarText = document.getElementById("waxBarText");
+            if (waxBar) waxBar.style.width = fallbackPercent + "%";
+            if (waxBarText) waxBarText.innerText = fallbackPercent + "% Completed";
+        }
+
+        let timerInterval = null;
+        let secondsElapsed = 0;
+
+        function startTimer() {
+            if (timerInterval) return;
+            timerInterval = setInterval(() => {
+                secondsElapsed++;
+                const hrs = String(Math.floor(secondsElapsed / 3600)).padStart(2, '0');
+                const mins = String(Math.floor((secondsElapsed % 3600) / 60)).padStart(2, '0');
+                const secs = String(secondsElapsed % 60).padStart(2, '0');
+                if (document.getElementById("processTimer")) {
+                    document.getElementById("processTimer").innerText = `${hrs}:${mins}:${secs}`;
+                }
+            }, 1000);
+        }
+
+        function resetTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            secondsElapsed = 0;
+            if (document.getElementById("processTimer")) {
+                document.getElementById("processTimer").innerText = "00:00:00";
+            }
+        }
+
+        function evaluateAlerts() {
+            const alertListEl = document.getElementById("dynamicAlertList");
+            if (!alertListEl) return;
+
+            const potentialAlerts = [];
+
+            if (currentIsRunning === 1 && currentUvIndex === 0) {
+                potentialAlerts.push({ id: "uv_not_working", type: "warning", icon: "fa-triangle-exclamation", text: "Warning: System is running, but UV lamp intensity is 0." });
+            }
+            if (currentTemp > 40) {
+                potentialAlerts.push({ id: "temp_high", type: "warning", icon: "fa-temperature-high", text: `Critical Warning: System temperature is high at ${currentTemp}°C.` });
+            }
+            if (currentWaxPercent < 15) {
+                potentialAlerts.push({ id: "wax_low", type: "warning", icon: "fa-droplet", text: `Low Wax Warning: Level is at ${currentWaxPercent}%.` });
+            }
+            if (potentialAlerts.length === 0) {
+                potentialAlerts.push({ id: "system_optimal", type: "success", icon: "fa-circle-check", text: "All system parameters operating within normal thresholds." });
+            }
+
+            const activeAlerts = potentialAlerts.filter(a => !dismissedAlerts.has(a.id));
+            alertListEl.innerHTML = "";
+
+            activeAlerts.forEach(alert => {
+                const card = document.createElement("div");
+                card.className = `alert-item-card ${alert.type}`;
+                card.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <i class="fa-solid ${alert.icon}"></i>
+                        <span>${alert.text}</span>
+                    </div>
+                    <button class="dismiss-btn" onclick="dismissAlert('${alert.id}')">Done</button>
+                `;
+                alertListEl.appendChild(card);
+            });
+        }
+
+        window.dismissAlert = function (alertId) {
+            dismissedAlerts.add(alertId);
+            evaluateAlerts();
+            logActivity(`Alert cleared: ${alertId}`, "Admin", "info", "Acknowledged");
+        };
+
+        onValue(controlData, (snapshot) => {
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                currentIsRunning = data.isRunning || 0;
+                currentIsUvRunning = data.uvStatus || 0;
+                currentIsWaxRunning = data.waxStatus || 0;
+
+                const fanToggleEl = document.getElementById("fanToggle");
+                if (fanToggleEl) fanToggleEl.checked = (data.funStatus === 1);
+
+                if (currentIsRunning === 1) {
+                    document.getElementById("start").innerText = "Stop System";
+                    document.getElementById("startContainer").style.borderColor = "#ef4444";
+                    startTimer();
+                } else {
+                    document.getElementById("start").innerText = "Start System";
+                    document.getElementById("startContainer").style.borderColor = "rgba(226, 232, 240, 0.8)";
+                    resetTimer();
+                }
+
+                if (currentIsWaxRunning === 1) {
+                    document.getElementById("waxStart").innerText = "Stop Wax";
+                    startWaxLoop();
+                } else {
+                    document.getElementById("waxStart").innerText = "Wax Coat";
+                    stopWaxLoop(0);
+                }
+
+                evaluateAlerts();
+            }
+        });
+
+        onValue(sensorDataRef, (snapshot) => {
+            if (snapshot.exists()) {
+                const telemetry = snapshot.val();
+                const fruitCountVal = telemetry.fruitCount !== undefined ? telemetry.fruitCount : 0;
+
+                if (document.getElementById("processedCount")) document.getElementById("processedCount").innerText = `${fruitCountVal} units`;
+                if (document.getElementById("totalProcessed")) document.getElementById("totalProcessed").innerText = fruitCountVal;
+
+                currentUvIndex = telemetry.uvIndex !== undefined ? telemetry.uvIndex : 0;
+                if (document.getElementById("intensityDisplay")) document.getElementById("intensityDisplay").innerText = currentUvIndex;
+
+                currentWaxPercent = telemetry.waxPercent !== undefined ? telemetry.waxPercent : 0;
+                if (document.getElementById("waxPercentDisplay")) document.getElementById("waxPercentDisplay").innerText = currentWaxPercent;
+
+                currentTemp = telemetry.temp !== undefined ? telemetry.temp : 28;
+                if (document.getElementById("temperature")) document.getElementById("temperature").innerText = currentTemp;
+
+                const motorSpeedVal = telemetry.motorSpeed !== undefined ? telemetry.motorSpeed : 0;
+                const derivedRpm = Math.round((motorSpeedVal / 255) * 60);
+                if (document.getElementById("speedRange")) document.getElementById("speedRange").value = derivedRpm;
+                if (document.getElementById("speedVal")) document.getElementById("speedVal").innerText = derivedRpm;
+
+                evaluateAlerts();
+            }
+        });
+
+        window.updateConveyorSpeed = function (rpmValue) {
+            document.getElementById('speedVal').innerText = rpmValue;
+            const mappedMotorSpeed = Math.round((rpmValue / 60) * 255);
+            update(ref(db, "data"), { motorSpeed: mappedMotorSpeed });
+            logActivity(`Conveyor speed adjusted to ${rpmValue} RPM`, "Admin", "info", "Logged");
+        };
+
+        window.updateFanToggle = function (isChecked) {
+            update(ref(db, "status"), { funStatus: isChecked ? 1 : 0 });
+            logActivity(`Air Dryer Blower turned ${isChecked ? "ON" : "OFF"}`, "Admin", "info", "Logged");
+        };
+
+        window.powerOn = function () {
+            update(ref(db, "status"), { isRunning: currentIsRunning === 1 ? 0 : 1 });
+        };
+
+        window.uvOn = function () {
+            update(ref(db, "status"), { uvStatus: currentIsUvRunning === 1 ? 0 : 1 });
+        };
+
+        window.waxOn = function () {
+            update(ref(db, "status"), { waxStatus: currentIsWaxRunning === 1 ? 0 : 1 });
+        };
+
+        logActivity("Admin Control Portal initialized", "System", "success", "Online");
+    </script>
+</body>
+
+</html>

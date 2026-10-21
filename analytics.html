@@ -6,113 +6,202 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fruit Processing Analytics</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <style>
+        :root {
+            --bg-left: #efeeee;
+            --bg-mid: #cb6499;
+            --bg-right: #efeeee;
+            --bg-light: #d79eb1;
+            --card-start: rgba(255, 255, 255, 0.75);
+            --card-end: rgba(255, 255, 255, 0.35);
+            --accent: #b61b5a;
+            --muted: rgba(0, 0, 0, 0.18);
+            --text-dark: #23181a;
+            --heading-color: #9b0742;
+            --font-stack: 'Poppins', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
         * {
-            box-sizing: border-box
+            box-sizing: border-box;
         }
 
         body {
-            font-family: Poppins, sans-serif;
+            font-family: var(--font-stack);
             margin: 0;
-            background: linear-gradient(135deg, #f6c1d1, #b96a89);
+            background: linear-gradient(135deg,
+                    var(--bg-left) 0%,
+                    var(--bg-light) 35%,
+                    var(--bg-mid) 70%,
+                    var(--bg-right) 100%);
             min-height: 100vh;
-            color: white;
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
         }
 
+        /* Header Styling */
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 30px;
-            color: white;
+            padding: 24px 48px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
         }
 
         .header h1 {
-            font-size: 22px;
-            margin: 0
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 0;
+            color: var(--heading-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .navBtns {
+            display: flex;
+            gap: 10px;
         }
 
         .navBtns button {
-            background: rgba(255, 255, 255, 0.25);
-            border: none;
-            padding: 10px 18px;
-            margin-left: 10px;
-            color: white;
+            background: rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            padding: 10px 20px;
+            color: var(--text-dark);
             border-radius: 20px;
-            cursor: pointer
+            cursor: pointer;
+            font-weight: 500;
+            font-family: var(--font-stack);
+            transition: all 0.2s ease;
         }
 
-        .navBtns button:hover {
-            background: rgba(255, 255, 255, 0.4)
+        .navBtns button:hover,
+        .navBtns button.active-btn {
+            background: var(--accent);
+            color: white;
+            border-color: transparent;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(182, 27, 90, 0.3);
         }
 
         .container {
-            padding: 20px
+            max-width: 1440px;
+            width: 92%;
+            margin: 32px auto;
+            flex: 1;
         }
 
         .section {
             display: none;
-            color: white;
         }
 
-        .active {
-            display: block
+        .section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
         }
 
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Summary Cards Grid */
         .cards {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
-            margin-bottom: 20px
+            margin-bottom: 24px;
         }
 
         .card {
-            background: rgba(255, 255, 255, 0.25);
-            backdrop-filter: blur(10px);
+            background: linear-gradient(145deg, var(--card-start), var(--card-end));
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             padding: 20px;
             border-radius: 20px;
-            color: #fff;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15)
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.08), inset 0 2px 6px rgba(255, 255, 255, 0.4);
         }
 
         .card h3 {
             margin: 0;
-            font-weight: 400
+            font-weight: 500;
+            font-size: 0.85rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .card h1 {
-            margin: 10px 0 0
+            margin: 8px 0 0;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        /* Charts Layout */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
         }
 
         .chartBox {
-            background: rgba(255, 255, 255, 0.25);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 100px;
-            margin-top: 20px
+            background: linear-gradient(145deg, var(--card-start), var(--card-end));
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 24px;
+            padding: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.08), inset 0 2px 6px rgba(255, 255, 255, 0.4);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
 
         canvas {
-            max-width: 100%
+            width: 100% !important;
+            max-height: 320px;
         }
 
-        @media(max-width:768px) {
+        @media(max-width: 1024px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media(max-width: 768px) {
             .header {
                 flex-direction: column;
                 align-items: flex-start;
-                gap: 10px
+                gap: 16px;
+                padding: 16px 20px;
             }
 
             .navBtns {
                 width: 100%;
                 display: flex;
-                flex-wrap: wrap
+                flex-wrap: wrap;
             }
 
             .navBtns button {
                 flex: 1;
-                margin: 5px 0
+                margin: 2px 0;
+                padding: 8px 12px;
+                font-size: 0.85rem;
             }
         }
     </style>
@@ -121,60 +210,67 @@
 <body>
 
     <div class="header">
-        <h1>🍎 Fruit UV & Wax Analytics</h1>
+        <h1><i class="fa-solid fa-chart-pie" style="color: var(--accent);"></i> Fruit UV & Wax Analytics</h1>
         <div class="navBtns">
-            <button onclick="showPage('daily')">Daily</button>
-            <button onclick="showPage('weekly')">Weekly</button>
-            <button onclick="showPage('monthly')">Monthly</button>
-            <button onclick="goTo()">Back to Admin Page</button>
+            <button onclick="showPage('daily', this)" id="btnDaily" class="active-btn">Daily</button>
+            <button onclick="showPage('weekly', this)" id="btnWeekly">Weekly</button>
+            <button onclick="showPage('monthly', this)" id="btnMonthly">Monthly</button>
+            <button onclick="goTo()"><i class="fa-solid fa-arrow-left"></i> Back to Admin</button>
         </div>
-        <script>
-            function goTo() {
-                window.location = "admin_page.html";
-            }
-        </script>
     </div>
+
+    <script>
+        function goTo() {
+            window.location = "admin.html";
+        }
+    </script>
 
     <div class="container">
 
-        <!-- DAILY -->
+        <!-- DAILY SECTION -->
         <div id="daily" class="section active">
             <div class="cards">
                 <div class="card">
                     <h3>Total Today</h3>
-                    <h1 id="todayTotal"></h1>
+                    <h1 id="todayTotal">--</h1>
                 </div>
                 <div class="card">
                     <h3>UV Disinfected</h3>
-                    <h1 id="todayUV"></h1>
+                    <h1 id="todayUV">--</h1>
                 </div>
                 <div class="card">
                     <h3>Wax Coated</h3>
-                    <h1 id="todayWax"></h1>
+                    <h1 id="todayWax">--</h1>
                 </div>
                 <div class="card">
                     <h3>UV Runtime</h3>
-                    <h1 id="uvDailyTime"></h1>
+                    <h1 id="uvDailyTime">--</h1>
                 </div>
                 <div class="card">
                     <h3>Wax Runtime</h3>
-                    <h1 id="waxDailyTime"></h1>
+                    <h1 id="waxDailyTime">--</h1>
                 </div>
                 <div class="card">
                     <h3>Energy Used</h3>
-                    <h1>20 kWh</h1>
+                    <h1 id="energyDaily">18.5 kWh</h1>
                 </div>
             </div>
-            <div class="chartBox"><canvas id="dailyChart"></canvas></div>
-            <div class="chartBox"><canvas id="dailyRuntimeChart"></canvas></div>
+            <div class="charts-grid">
+                <div class="chartBox">
+                    <canvas id="dailyChart"></canvas>
+                </div>
+                <div class="chartBox">
+                    <canvas id="dailyRuntimeChart"></canvas>
+                </div>
+            </div>
         </div>
 
-        <!-- WEEKLY -->
+        <!-- WEEKLY SECTION -->
         <div id="weekly" class="section">
             <div class="cards">
                 <div class="card">
                     <h3>Total Fruits</h3>
-                    <h1>4350</h1>
+                    <h1 id="weeklyTotal">4,350</h1>
                 </div>
                 <div class="card">
                     <h3>UV Runtime</h3>
@@ -189,16 +285,22 @@
                     <h1>2.1 L</h1>
                 </div>
             </div>
-            <div class="chartBox"><canvas id="weeklyChart"></canvas></div>
-            <div class="chartBox"><canvas id="weeklyRuntimeChart"></canvas></div>
+            <div class="charts-grid">
+                <div class="chartBox">
+                    <canvas id="weeklyChart"></canvas>
+                </div>
+                <div class="chartBox">
+                    <canvas id="weeklyRuntimeChart"></canvas>
+                </div>
+            </div>
         </div>
 
-        <!-- MONTHLY -->
+        <!-- MONTHLY SECTION -->
         <div id="monthly" class="section">
             <div class="cards">
                 <div class="card">
                     <h3>Total Fruits</h3>
-                    <h1>25,600</h1>
+                    <h1 id="monthlyTotal">25,600</h1>
                 </div>
                 <div class="card">
                     <h3>UV Runtime</h3>
@@ -213,38 +315,106 @@
                     <h1>430 kWh</h1>
                 </div>
             </div>
-            <div class="chartBox"><canvas id="monthlyChart"></canvas></div>
-            <div class="chartBox"><canvas id="monthlyRuntimeChart"></canvas></div>
+            <div class="charts-grid">
+                <div class="chartBox">
+                    <canvas id="monthlyChart"></canvas>
+                </div>
+                <div class="chartBox">
+                    <canvas id="monthlyRuntimeChart"></canvas>
+                </div>
+            </div>
         </div>
 
     </div>
 
-    <script>
-        function showPage(page) { document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active')); document.getElementById(page).classList.add('active'); }
+    <!-- Firebase Realtime Sync & Analytics Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
 
-        const data = { daily: [120, 150, 180, 170, 160, 190, 210], weekly: [980, 1020, 1100, 1250], monthly: [4200, 4500, 4700, 5200, 5600, 6100] };
-        const uvDaily = [30, 35, 40, 38, 36, 42, 45];
-        const waxDaily = [20, 25, 28, 27, 26, 29, 30];
-        const uvWeekly = [60, 70, 75, 80];
-        const waxWeekly = [45, 50, 48, 47];
-        const uvMonthly = [260, 280, 300, 320, 340, 360];
-        const waxMonthly = [190, 210, 220, 230, 240, 260];
+        const firebaseConfig = {
+            apiKey: "AIzaSyDeeC83zMYqUCQ65qXxHexA9n90y5K-3fU",
+            authDomain: "uvwax-8f837.firebaseapp.com",
+            databaseURL: "https://uvwax-8f837-default-rtdb.firebaseio.com",
+            projectId: "uvwax-8f837",
+            storageBucket: "uvwax-8f837.firebasestorage.app",
+            messagingSenderId: "398816495926",
+            appId: "1:398816495926:web:0be2aa1f749ed68bd2cb97",
+            measurementId: "G-XZ36YCLBLG"
+        };
 
-        const today = data.daily[data.daily.length - 1];
-        document.getElementById('todayTotal').innerText = today;
-        document.getElementById('todayUV').innerText = Math.round(today * 0.6);
-        document.getElementById('todayWax').innerText = Math.round(today * 0.4);
-        document.getElementById('uvDailyTime').innerText = '45 min';
-        document.getElementById('waxDailyTime').innerText = '30 min';
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase();
+        const sensorDataRef = ref(db, "data");
 
-        new Chart(document.getElementById('dailyChart'), { type: 'line', data: { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], datasets: [{ label: 'Daily Fruits', data: data.daily, borderWidth: 3 }] } });
-        new Chart(document.getElementById('weeklyChart'), { type: 'bar', data: { labels: ['Week1', 'Week2', 'Week3', 'Week4'], datasets: [{ label: 'Weekly Fruits', data: data.weekly }] } });
-        new Chart(document.getElementById('monthlyChart'), { type: 'line', data: { labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], datasets: [{ label: 'Monthly Fruits', data: data.monthly, borderWidth: 3 }] } });
+        // Tab switching function
+        window.showPage = function (page, btn) {
+            document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.navBtns button').forEach(b => { if (!b.textContent.includes('Back')) b.classList.remove('active-btn'); });
+            document.getElementById(page).classList.add('active');
+            if (btn) btn.classList.add('active-btn');
+        };
 
-        // RUNTIME CHARTS
-        new Chart(document.getElementById('dailyRuntimeChart'), { type: 'bar', data: { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], datasets: [{ label: 'UV Runtime (min)', data: uvDaily }, { label: 'Wax Runtime (min)', data: waxDaily }] } });
-        new Chart(document.getElementById('weeklyRuntimeChart'), { type: 'bar', data: { labels: ['Week1', 'Week2', 'Week3', 'Week4'], datasets: [{ label: 'UV Runtime', data: uvWeekly }, { label: 'Wax Runtime', data: waxWeekly }] } });
-        new Chart(document.getElementById('monthlyRuntimeChart'), { type: 'line', data: { labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], datasets: [{ label: 'UV Runtime', data: uvMonthly, borderWidth: 3 }, { label: 'Wax Runtime', data: waxMonthly, borderWidth: 3 }] } });
+        // Chart Global Configuration
+        Chart.defaults.font.family = 'Poppins';
+        Chart.defaults.color = '#23181a';
+
+        // Initialize Charts
+        const dailyChart = new Chart(document.getElementById('dailyChart'), {
+            type: 'line',
+            data: { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], datasets: [{ label: 'Daily Fruit Volume', data: [120, 150, 180, 170, 160, 190, 210], borderColor: '#b61b5a', backgroundColor: 'rgba(182, 27, 90, 0.1)', fill: true, borderWidth: 3, tension: 0.3 }] },
+            options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+        });
+
+        const dailyRuntimeChart = new Chart(document.getElementById('dailyRuntimeChart'), {
+            type: 'bar',
+            data: { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], datasets: [{ label: 'UV Runtime (min)', data: [30, 35, 40, 38, 36, 42, 45], backgroundColor: '#9b0742', borderRadius: 6 }, { label: 'Wax Runtime (min)', data: [20, 25, 28, 27, 26, 29, 30], backgroundColor: '#d79eb1', borderRadius: 6 }] },
+            options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+        });
+
+        new Chart(document.getElementById('weeklyChart'), {
+            type: 'bar',
+            data: { labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'], datasets: [{ label: 'Weekly Fruit Volume', data: [980, 1020, 1100, 1250], backgroundColor: '#b61b5a', borderRadius: 8 }] },
+            options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+        });
+
+        new Chart(document.getElementById('weeklyRuntimeChart'), {
+            type: 'bar',
+            data: { labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'], datasets: [{ label: 'UV Runtime', data: [60, 70, 75, 80], backgroundColor: '#9b0742', borderRadius: 6 }, { label: 'Wax Runtime', data: [45, 50, 48, 47], backgroundColor: '#d79eb1', borderRadius: 6 }] },
+            options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+        });
+
+        new Chart(document.getElementById('monthlyChart'), {
+            type: 'line',
+            data: { labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], datasets: [{ label: 'Monthly Fruit Volume', data: [4200, 4500, 4700, 5200, 5600, 6100], borderColor: '#b61b5a', backgroundColor: 'rgba(182, 27, 90, 0.1)', fill: true, borderWidth: 3, tension: 0.3 }] },
+            options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+        });
+
+        new Chart(document.getElementById('monthlyRuntimeChart'), {
+            type: 'line',
+            data: { labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], datasets: [{ label: 'UV Runtime', data: [260, 280, 300, 320, 340, 360], borderColor: '#9b0742', borderWidth: 2, tension: 0.3 }, { label: 'Wax Runtime', data: [190, 210, 220, 230, 240, 260], borderColor: '#cb6499', borderWidth: 2, tension: 0.3 }] },
+            options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+        });
+
+        // Sync Real-Time Firebase Telemetry (`fruitCount`) into Today's Analytics
+        onValue(sensorDataRef, (snapshot) => {
+            if (snapshot.exists()) {
+                const telemetry = snapshot.val();
+                const currentFruitCount = telemetry.fruitCount !== undefined ? telemetry.fruitCount : 0;
+
+                // Update text elements with live count
+                document.getElementById('todayTotal').innerText = currentFruitCount;
+                document.getElementById('todayUV').innerText = Math.round(currentFruitCount * 0.6);
+                document.getElementById('todayWax').innerText = Math.round(currentFruitCount * 0.4);
+                document.getElementById('uvDailyTime').innerText = `${Math.round(currentFruitCount * 0.25)} min`;
+                document.getElementById('waxDailyTime').innerText = `${Math.round(currentFruitCount * 0.15)} min`;
+
+                // Dynamically update today's last data point on the Daily Volume chart
+                const dailyData = dailyChart.data.datasets[0].data;
+                dailyData[dailyData.length - 1] = currentFruitCount;
+                dailyChart.update();
+            }
+        });
     </script>
 
 </body>

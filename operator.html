@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UVDEW - Operator Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="./css/operator.css">
+    <link rel="shortcut icon" href="./images/623706670_933528319068570_7706221529996436771_n.png" type="image/x-icon">
+    <style>
+        /* Smooth transition for progress bar animation when waxStatus is active */
+        #waxBar {
+            transition: width 0.05s linear;
+        }
+
+        /* Layout styling to display UV Intensity and Wax Percent side by side */
+        .uv-wax-side-by-side {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        .uv-wax-side-by-side .processName {
+            flex: 1;
+        }
+
+        /* Scrollable dynamic alert list styling */
+        .dynamic-alert-list {
+            max-height: 160px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding-right: 4px;
+        }
+
+        .alert-item-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            gap: 10px;
+        }
+
+        .alert-item-card.warning {
+            background: rgba(239, 68, 68, 0.15);
+            border-left: 4px solid #EF4444;
+            color: #b91c1c;
+        }
+
+        .alert-item-card.info {
+            background: rgba(59, 130, 246, 0.15);
+            border-left: 4px solid #3B82F6;
+            color: #1d4ed8;
+        }
+
+        .alert-item-card.success {
+            background: rgba(34, 197, 94, 0.15);
+            border-left: 4px solid #22C55E;
+            color: #15803d;
+        }
+
+        .dismiss-btn {
+            background: rgba(0, 0, 0, 0.08);
+            border: none;
+            padding: 4px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .dismiss-btn:hover {
+            background: rgba(0, 0, 0, 0.15);
+        }
+
+        /* Scrollable container for dynamic activity table log */
+        .activity-scroll-container {
+            max-height: 220px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="user_header">
+            <img src="./images/623706670_933528319068570_7706221529996436771_n.png" alt="UVDEW Logo" class="logo">
+            <div>
+                <h3>Operator Portal</h3>
+                <span class="status-badge online"><i class="fa-solid fa-circle"></i> System Online</span>
+            </div>
+        </div>
+        <div class="logout_container">
+            <button id="logoutBtn" class="logoutBtn"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+        </div>
+    </header>
+
+    <!-- Top Diagnostics Bar -->
+    <section class="system-summary-bar">
+        <div class="summary-card">
+            <i class="fa-solid fa-microchip summary-icon"></i>
+            <div>
+                <span class="summary-label">PLC Connection</span>
+                <h4 class="summary-value green-text">Connected</h4>
+            </div>
+        </div>
+        <div class="summary-card">
+            <i class="fa-solid fa-boxes-stacked summary-icon"></i>
+            <div>
+                <span class="summary-label">Active Batch</span>
+                <h4 class="summary-value" id="currentBatch">#BATCH-2026-042</h4>
+            </div>
+        </div>
+        <div class="summary-card">
+            <i class="fa-solid fa-apple-whole summary-icon"></i>
+            <div>
+                <span class="summary-label">Produce Type</span>
+                <h4 class="summary-value">Dragon Fruit</h4>
+            </div>
+        </div>
+        <div class="summary-card">
+            <i class="fa-solid fa-gauge-high summary-icon"></i>
+            <div>
+                <span class="summary-label">Items Processed</span>
+                <h4 class="summary-value" id="processedCount">0 units</h4>
+            </div>
+        </div>
+    </section>
+
+    <main>
+        <!-- Device Controls Sidebar -->
+        <aside>
+            <div class="dc_container">
+                <h4>System Device Control</h4>
+            </div>
+            <nav class="control_container">
+                <ul>
+                    <li class="control-pill" onclick="powerOn()" id="startContainer">
+                        <i class="fa-solid fa-power-off fa-lg" id="startIcon"></i>
+                        <h4 id="start">Start System</h4>
+                    </li>
+                    <li class="control-pill" onclick="uvOn()" id="uvStartContainer">
+                        <i class="fa-solid fa-lightbulb fa-lg" id="uvStartIcon"></i>
+                        <h4 id="uvStart">UV Disinfect</h4>
+                    </li>
+                    <li class="control-pill" onclick="waxOn()" id="waxStartContainer">
+                        <i class="fa-solid fa-droplet fa-lg" id="waxStartIcon"></i>
+                        <h4 id="waxStart">Wax Coat</h4>
+                    </li>
+                    <li class="control-pill emergency-pill" onclick="emergency()">
+                        <i class="fa-solid fa-circle-stop fa-lg"></i>
+                        <h4>Emergency Stop</h4>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Metrics Column 1: Intensities & Processes -->
+        <section class="process">
+            <!-- Side-by-side container for UV Intensity and Wax Percent -->
+            <div class="uv-wax-side-by-side">
+                <div class="processName">
+                    <h2>UV Intensity</h2>
+                    <div class="intensity">
+                        <h1 id="intensityDisplay">0</h1>
+                        <h3>mW/cm<sup>2</sup></h3>
+                    </div>
+                </div>
+
+                <div class="processName">
+                    <h2>Wax Percent</h2>
+                    <div class="intensity">
+                        <h1 id="waxPercentDisplay">0</h1>
+                        <h3>%</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="processName">
+                <h2>Wax Coating Progress</h2>
+                <div class="progress-wrap">
+                    <div class="progress-track">
+                        <div id="waxBar" class="progress-fill" style="width: 0%;"></div>
+                    </div>
+                </div>
+                <p id="waxBarText">0% Completed</p>
+            </div>
+
+            <div class="processName">
+                <h2>Process Timer</h2>
+                <div class="intensity">
+                    <h1 id="processTimer" style="font-size: 2.2rem;">00:00:00</h1>
+                </div>
+            </div>
+        </section>
+
+        <!-- Metrics Column 2: Temperatures & Manual Controls -->
+        <section class="temp_not">
+            <div class="processName">
+                <h2>System Temperature</h2>
+                <div class="intensity">
+                    <h1 id="temperature">28</h1>
+                    <h3 class="degree">°C</h3>
+                </div>
+            </div>
+
+            <!-- Manual Adjustment Controls -->
+            <div class="manual-controls">
+                <h4>Manual Adjustments</h4>
+                <div class="control-group">
+                    <label for="speedRange">Conveyor Speed (<span id="speedVal">60</span> RPM)</label>
+                    <input type="range" id="speedRange" min="0" max="60" value="60" class="slider"
+                        oninput="updateConveyorSpeed(this.value)">
+                </div>
+                <div class="control-group">
+                    <label for="fanToggle">Air Dryer Blower</label>
+                    <label class="switch">
+                        <input type="checkbox" id="fanToggle" onchange="updateFanToggle(this.checked)">
+                        <span class="slider-toggle round"></span>
+                    </label>
+                </div>
+            </div>
+        </section>
+
+        <!-- Full-Width Scrollable Live System Alerts Section -->
+        <section class="alert-section-full" style="grid-column: 1 / -1; width: 100%;">
+            <div class="notification" style="width: 100%; box-sizing: border-box;">
+                <h2>Live System Alerts</h2>
+                <div id="dynamicAlertList" class="dynamic-alert-list">
+                    <!-- Populated dynamically via script -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Bottom Full-Width Table: Real-Time Event Log -->
+        <section class="activity-log-section">
+            <h2>Recent System Activity</h2>
+            <div class="table-container activity-scroll-container">
+                <table class="activity-table">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Event Description</th>
+                            <th>Operator / Source</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="activityLogBody">
+                        <!-- Populated dynamically via script -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- Session Validation Script -->
+    <script>
+        const loggedin = localStorage.getItem("loggedin");
+        const username = localStorage.getItem("username");
+        const role = localStorage.getItem("role");
+
+        if (loggedin !== "true" || role !== "operator") {
+            window.location = "index.html";
+        }
+
+        const logoutBtn = document.getElementById("logoutBtn");
+        logoutBtn.onclick = function () {
+            localStorage.removeItem("loggedin");
+            localStorage.removeItem("username");
+            localStorage.removeItem("role");
+            window.location = "index.html";
+        }
+    </script>
+
+    <!-- Modal Event Listeners -->
+    <script>
+        const power_modal = document.getElementById("power_modal");
+        const noBtn = document.getElementById("noBtn");
+
+        document.getElementById("startContainer").addEventListener("click", function () {
+            power_modal.style.display = "flex";
+        });
+        if (noBtn) {
+            noBtn.onclick = function () {
+                power_modal.style.display = "none";
+            }
+        }
+        window.onclick = function (e) {
+            if (e.target == power_modal) power_modal.style.display = "none";
+        }
+    </script>
+
+    <!-- Firebase Realtime Sync & Control Functions -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+        import { getDatabase, ref, update, onValue }
+            from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDeeC83zMYqUCQ65qXxHexA9n90y5K-3fU",
+            authDomain: "uvwax-8f837.firebaseapp.com",
+            databaseURL: "https://uvwax-8f837-default-rtdb.firebaseio.com",
+            projectId: "uvwax-8f837",
+            storageBucket: "uvwax-8f837.firebasestorage.app",
+            messagingSenderId: "398816495926",
+            appId: "1:398816495926:web:0be2aa1f749ed68bd2cb97",
+            measurementId: "G-XZ36YCLBLG"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase();
+        const controlData = ref(db, "status");
+        const sensorDataRef = ref(db, "data");
+
+        let currentIsRunning = 0;
+        let currentIsUvRunning = 0;
+        let currentIsWaxRunning = 0;
+        let currentUvIndex = 0;
+        let currentTemp = 28;
+        let currentWaxPercent = 0;
+
+        // Keep track of dismissed alert IDs
+        const dismissedAlerts = new Set();
+        const activityLogs = [];
+
+        function logActivity(description, source = "Operator", statusType = "success", statusText = "Active") {
+            const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            activityLogs.unshift({ time: timeStr, desc: description, source, statusType, statusText });
+            if (activityLogs.length > 25) activityLogs.pop(); // Cap history limit
+            renderActivityLog();
+        }
+
+        function renderActivityLog() {
+            const tbody = document.getElementById("activityLogBody");
+            if (!tbody) return;
+            tbody.innerHTML = "";
+            activityLogs.forEach(item => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td>${item.time}</td>
+                    <td>${item.desc}</td>
+                    <td>${item.source}</td>
+                    <td><span class="badge ${item.statusType}">${item.statusText}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Automatically generate today's batch string (e.g., #BATCH-2026-06-07)
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        const generatedBatchName = `#BATCH-${year}-${month}-${day}`;
+
+        const activeBatchEl = document.getElementById("currentBatch");
+        if (activeBatchEl) {
+            activeBatchEl.innerText = generatedBatchName;
+        }
+
+        // Wax Progress Loop Variables
+        let waxInterval = null;
+        let currentProgress = 0;
+
+        function startWaxLoop() {
+            if (waxInterval) return;
+            waxInterval = setInterval(() => {
+                currentProgress += 10;
+                if (currentProgress > 100) {
+                    currentProgress = 0;
+                }
+                const waxBar = document.getElementById("waxBar");
+                const waxBarText = document.getElementById("waxBarText");
+                if (waxBar) waxBar.style.width = currentProgress + "%";
+                if (waxBarText) waxBarText.innerText = currentProgress + "% Completed";
+            }, 100);
+        }
+
+        function stopWaxLoop(fallbackPercent = 0) {
+            if (waxInterval) {
+                clearInterval(waxInterval);
+                waxInterval = null;
+            }
+            currentProgress = fallbackPercent;
+            const waxBar = document.getElementById("waxBar");
+            const waxBarText = document.getElementById("waxBarText");
+            if (waxBar) waxBar.style.width = fallbackPercent + "%";
+            if (waxBarText) waxBarText.innerText = fallbackPercent + "% Completed";
+        }
+
+        // Process Timer Variables
+        let timerInterval = null;
+        let secondsElapsed = 0;
+
+        function startTimer() {
+            if (timerInterval) return;
+            timerInterval = setInterval(() => {
+                secondsElapsed++;
+                updateTimerDisplay();
+            }, 1000);
+        }
+
+        function resetTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            secondsElapsed = 0;
+            updateTimerDisplay();
+        }
+
+        function updateTimerDisplay() {
+            const hrs = String(Math.floor(secondsElapsed / 3600)).padStart(2, '0');
+            const mins = String(Math.floor((secondsElapsed % 3600) / 60)).padStart(2, '0');
+            const secs = String(secondsElapsed % 60).padStart(2, '0');
+            const timerEl = document.getElementById("processTimer");
+            if (timerEl) {
+                timerEl.innerText = `${hrs}:${mins}:${secs}`;
+            }
+        }
+
+        function evaluateAlerts() {
+            const alertListEl = document.getElementById("dynamicAlertList");
+            if (!alertListEl) return;
+
+            const potentialAlerts = [];
+
+            if (currentIsRunning === 1 && currentUvIndex === 0) {
+                potentialAlerts.push({
+                    id: "uv_not_working",
+                    type: "warning",
+                    icon: "fa-triangle-exclamation",
+                    text: "Warning: System is running, but UV lamp intensity is 0 (UV may not be working)."
+                });
+            }
+
+            if (currentTemp > 40) {
+                potentialAlerts.push({
+                    id: "temp_high",
+                    type: "warning",
+                    icon: "fa-temperature-high",
+                    text: `Critical Warning: System temperature is high at ${currentTemp}°C (above 40°C threshold).`
+                });
+            }
+
+            if (currentWaxPercent < 15) {
+                potentialAlerts.push({
+                    id: "wax_low",
+                    type: "warning",
+                    icon: "fa-droplet",
+                    text: `Low Wax Warning: Wax level is critically low at ${currentWaxPercent}%.`
+                });
+            }
+
+            if (potentialAlerts.length === 0) {
+                potentialAlerts.push({
+                    id: "system_optimal",
+                    type: "success",
+                    icon: "fa-circle-check",
+                    text: "All system parameters operating within normal thresholds."
+                });
+            }
+
+            const activeAlerts = potentialAlerts.filter(a => !dismissedAlerts.has(a.id));
+
+            alertListEl.innerHTML = "";
+            if (activeAlerts.length === 0) {
+                alertListEl.innerHTML = `<div class="alert-item-card info"><div class="alert-content"><i class="fa-solid fa-circle-info"></i> All alerts have been acknowledged and cleared.</div></div>`;
+                return;
+            }
+
+            activeAlerts.forEach(alert => {
+                const card = document.createElement("div");
+                card.className = `alert-item-card ${alert.type}`;
+                card.innerHTML = `
+                    <div class="alert-content">
+                        <i class="fa-solid ${alert.icon}"></i>
+                        <span>${alert.text}</span>
+                    </div>
+                    <button class="dismiss-btn" onclick="dismissAlert('${alert.id}')">Done</button>
+                `;
+                alertListEl.appendChild(card);
+            });
+        }
+
+        window.dismissAlert = function (alertId) {
+            dismissedAlerts.add(alertId);
+            evaluateAlerts();
+            logActivity(`Alert acknowledged / cleared: ${alertId}`, "Operator", "info", "Acknowledged");
+        };
+
+        // Track previous status states to log changes only when toggled
+        let prevRunningState = null;
+        let prevUvState = null;
+        let prevWaxState = null;
+
+        onValue(controlData, (snapshot) => {
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                currentIsRunning = data.isRunning || 0;
+                currentIsUvRunning = data.uvStatus || 0;
+                currentIsWaxRunning = data.waxStatus || 0;
+                const funStatus = data.funStatus || 0;
+
+                const fanToggleEl = document.getElementById("fanToggle");
+                if (fanToggleEl) {
+                    fanToggleEl.checked = (funStatus === 1);
+                }
+
+                if (prevRunningState !== null && prevRunningState !== currentIsRunning) {
+                    logActivity(currentIsRunning === 1 ? "System Started" : "System Stopped", "System PLC", currentIsRunning === 1 ? "success" : "info", currentIsRunning === 1 ? "Active" : "Stopped");
+                }
+                prevRunningState = currentIsRunning;
+
+                if (prevUvState !== null && prevUvState !== currentIsUvRunning) {
+                    logActivity(currentIsUvRunning === 1 ? "UV Disinfection Initiated" : "UV Disinfection Stopped", "System PLC", currentIsUvRunning === 1 ? "success" : "info", currentIsUvRunning === 1 ? "Active" : "Completed");
+                }
+                prevUvState = currentIsUvRunning;
+
+                if (prevWaxState !== null && prevWaxState !== currentIsWaxRunning) {
+                    logActivity(currentIsWaxRunning === 1 ? "Wax Coating Process Initiated" : "Wax Coating Process Stopped", "System PLC", currentIsWaxRunning === 1 ? "success" : "info", currentIsWaxRunning === 1 ? "Active" : "Completed");
+                }
+                prevWaxState = currentIsWaxRunning;
+
+                if (currentIsRunning === 1) {
+                    document.getElementById("start").innerHTML = "Stop System";
+                    document.getElementById('startContainer').style.border = "2px #EF4444 solid";
+                    document.getElementById('startIcon').classList.add('startAnimation');
+                    if (power_modal) power_modal.style.display = "none";
+                    if (document.getElementById('onOrOff')) document.getElementById('onOrOff').innerHTML = 'off';
+                    startTimer();
+                } else {
+                    document.getElementById("start").innerHTML = "Start System";
+                    document.getElementById('startContainer').style.border = "";
+                    document.getElementById('startIcon').classList.remove('startAnimation');
+                    if (power_modal) power_modal.style.display = "none";
+                    if (document.getElementById('onOrOff')) document.getElementById('onOrOff').innerHTML = 'on';
+                    resetTimer();
+                }
+
+                if (currentIsUvRunning === 1) {
+                    document.getElementById("uvStart").innerHTML = "Stop UV";
+                    document.getElementById('uvStartContainer').style.border = "2px #EF4444 solid";
+                    document.getElementById('uvStartIcon').classList.add('startAnimation');
+                } else {
+                    document.getElementById("uvStart").innerHTML = "UV Disinfect";
+                    document.getElementById('uvStartContainer').style.border = "";
+                    document.getElementById('uvStartIcon').classList.remove('startAnimation');
+                }
+
+                if (currentIsWaxRunning === 1) {
+                    document.getElementById("waxStart").innerHTML = "Stop Wax";
+                    document.getElementById('waxStartContainer').style.border = "2px #EF4444 solid";
+                    document.getElementById('waxStartIcon').classList.add('startAnimation');
+                    startWaxLoop();
+                } else {
+                    document.getElementById("waxStart").innerHTML = "Wax Coat";
+                    document.getElementById('waxStartContainer').style.border = "";
+                    document.getElementById('waxStartIcon').classList.remove('startAnimation');
+                    stopWaxLoop(0);
+                }
+
+                evaluateAlerts();
+            }
+        });
+
+        onValue(sensorDataRef, (snapshot) => {
+            if (snapshot.exists()) {
+                const telemetry = snapshot.val();
+
+                const fruitCountVal = telemetry.fruitCount !== undefined ? telemetry.fruitCount : 0;
+                const processedCountEl = document.getElementById("processedCount");
+                if (processedCountEl) {
+                    processedCountEl.innerText = `${fruitCountVal} units`;
+                }
+
+                currentUvIndex = telemetry.uvIndex !== undefined ? telemetry.uvIndex : 0;
+                const intensityDisplayEl = document.getElementById("intensityDisplay");
+                if (intensityDisplayEl) {
+                    intensityDisplayEl.innerText = currentUvIndex;
+                }
+
+                currentWaxPercent = telemetry.waxPercent !== undefined ? telemetry.waxPercent : 0;
+                const waxPercentDisplayEl = document.getElementById("waxPercentDisplay");
+                if (waxPercentDisplayEl) {
+                    waxPercentDisplayEl.innerText = currentWaxPercent;
+                }
+
+                currentTemp = telemetry.temp !== undefined ? telemetry.temp : 28;
+                const temperatureEl = document.getElementById("temperature");
+                if (temperatureEl) {
+                    temperatureEl.innerText = currentTemp;
+                }
+
+                const motorSpeedVal = telemetry.motorSpeed !== undefined ? telemetry.motorSpeed : 0;
+                const derivedRpm = Math.round((motorSpeedVal / 255) * 60);
+                const speedRangeEl = document.getElementById("speedRange");
+                const speedValEl = document.getElementById("speedVal");
+                if (speedRangeEl && !speedRangeEl.matches(':active')) {
+                    speedRangeEl.value = derivedRpm;
+                }
+                if (speedValEl) {
+                    speedValEl.innerText = derivedRpm;
+                }
+
+                evaluateAlerts();
+            } else {
+                console.log("No telemetry data found under /data");
+            }
+        });
+
+        window.updateConveyorSpeed = function (rpmValue) {
+            document.getElementById('speedVal').innerText = rpmValue;
+            const mappedMotorSpeed = Math.round((rpmValue / 60) * 255);
+            const dataRef = ref(db, "data");
+            update(dataRef, { motorSpeed: mappedMotorSpeed }).catch((error) => {
+                console.error("Failed to update motorSpeed:", error);
+            });
+            logActivity(`Conveyor speed adjusted to ${rpmValue} RPM`, "Operator", "info", "Logged");
+        };
+
+        window.updateFanToggle = function (isChecked) {
+            const statusRef = ref(db, "status");
+            const funStatusVal = isChecked ? 1 : 0;
+            update(statusRef, { funStatus: funStatusVal }).catch((error) => {
+                console.error("Failed to update funStatus:", error);
+            });
+            logActivity(`Air Dryer Blower turned ${isChecked ? "ON" : "OFF"}`, "Operator", "info", "Logged");
+        };
+
+        window.powerOn = function () {
+            const setStart = ref(db, "status");
+            if (currentIsRunning === 1) {
+                update(setStart, { isRunning: 0 }).catch((error) => console.error("Failed to stop system:", error));
+            } else {
+                update(setStart, { isRunning: 1 }).catch((error) => console.error("Failed to start system:", error));
+            }
+        };
+
+        window.uvOn = function () {
+            const setUv = ref(db, "status");
+            if (currentIsUvRunning === 1) {
+                update(setUv, { uvStatus: 0 }).catch((error) => console.error("Failed to stop UV:", error));
+            } else {
+                update(setUv, { uvStatus: 1 }).catch((error) => console.error("Failed to start UV:", error));
+            }
+        };
+
+        window.waxOn = function () {
+            const setWax = ref(db, "status");
+            if (currentIsWaxRunning === 1) {
+                update(setWax, { waxStatus: 0 }).catch((error) => console.error("Failed to stop Wax:", error));
+            } else {
+                update(setWax, { waxStatus: 1 }).catch((error) => console.error("Failed to start Wax:", error));
+            }
+        };
+
+        // Initialize default initial activity log entry
+        logActivity("Operator Portal initialized & connected", "System", "success", "Online");
+    </script>
+</body>
+
+</html>
