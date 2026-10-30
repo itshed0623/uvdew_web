@@ -148,13 +148,10 @@
                         <i class="fa-solid fa-lightbulb fa-lg" id="uvStartIcon"></i>
                         <h4 id="uvStart">UV Disinfect</h4>
                     </li>
-                    <li class="control-pill" onclick="waxOn()" id="waxStartContainer">
+                    <!-- function for turning on wax onclick="waxOn()" -->
+                    <li class="control-pill" id="waxStartContainer">
                         <i class="fa-solid fa-droplet fa-lg" id="waxStartIcon"></i>
                         <h4 id="waxStart">Wax Coat</h4>
-                    </li>
-                    <li class="control-pill emergency-pill" onclick="emergency()">
-                        <i class="fa-solid fa-circle-stop fa-lg"></i>
-                        <h4>Emergency Stop</h4>
                     </li>
                 </ul>
             </nav>
@@ -191,12 +188,7 @@
                 <p id="waxBarText">0% Completed</p>
             </div>
 
-            <div class="processName">
-                <h2>Process Timer</h2>
-                <div class="intensity">
-                    <h1 id="processTimer" style="font-size: 2.2rem;">00:00:00</h1>
-                </div>
-            </div>
+
         </section>
 
         <!-- Metrics Column 2: Temperatures & Manual Controls -->
@@ -209,8 +201,14 @@
                 </div>
             </div>
 
+            <div class="processName">
+                <h2>Process Timer</h2>
+                <div class="intensity">
+                    <h1 id="processTimer" style="font-size: 2.2rem;">00:00:00</h1>
+                </div>
+            </div>
             <!-- Manual Adjustment Controls -->
-            <div class="manual-controls">
+            <!-- <div class="manual-controls">
                 <h4>Manual Adjustments</h4>
                 <div class="control-group">
                     <label for="speedRange">Conveyor Speed (<span id="speedVal">60</span> RPM)</label>
@@ -224,7 +222,7 @@
                         <span class="slider-toggle round"></span>
                     </label>
                 </div>
-            </div>
+            </div> -->
         </section>
 
         <!-- Full-Width Scrollable Live System Alerts Section -->
@@ -591,7 +589,10 @@
                     waxPercentDisplayEl.innerText = currentWaxPercent;
                 }
 
-                currentTemp = telemetry.temp !== undefined ? telemetry.temp : 28;
+                // Updated to read 'temperature' from Firebase and format to 1 decimal place (or use Math.round if you prefer whole numbers)
+                const rawTemp = telemetry.temperature !== undefined ? telemetry.temperature : 28;
+                currentTemp = typeof rawTemp === 'number' ? Number(rawTemp.toFixed(1)) : rawTemp;
+
                 const temperatureEl = document.getElementById("temperature");
                 if (temperatureEl) {
                     temperatureEl.innerText = currentTemp;
@@ -632,17 +633,22 @@
             });
             logActivity(`Air Dryer Blower turned ${isChecked ? "ON" : "OFF"}`, "Operator", "info", "Logged");
         };
-
+        let uvOnStatus = false;
         window.powerOn = function () {
             const setStart = ref(db, "status");
             if (currentIsRunning === 1) {
                 update(setStart, { isRunning: 0 }).catch((error) => console.error("Failed to stop system:", error));
+                uvOnStatus = true;
             } else {
                 update(setStart, { isRunning: 1 }).catch((error) => console.error("Failed to start system:", error));
+                uvOnStatus = false;
             }
         };
 
         window.uvOn = function () {
+            if (currentIsRunning !== 1) {
+                return; // Block execution when system is not running
+            }
             const setUv = ref(db, "status");
             if (currentIsUvRunning === 1) {
                 update(setUv, { uvStatus: 0 }).catch((error) => console.error("Failed to stop UV:", error));
