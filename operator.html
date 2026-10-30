@@ -342,7 +342,7 @@
     <!-- Firebase Realtime Sync & Control Functions -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-        import { getDatabase, ref, update, onValue }
+        import { getDatabase, ref, update, onValue, get, set, runTransaction }
             from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
 
         const firebaseConfig = {
@@ -360,6 +360,7 @@
         const db = getDatabase();
         const controlData = ref(db, "status");
         const sensorDataRef = ref(db, "data");
+        const timerDataRef = ref(db, "analytics/timer");
 
         let currentIsRunning = 0;
         let currentIsUvRunning = 0;
@@ -399,6 +400,7 @@
         const month = String(today.getMonth() + 1).padStart(2, '0');
         const day = String(today.getDate()).padStart(2, '0');
         const generatedBatchName = `#BATCH-${year}-${month}-${day}`;
+        const dateKey = `${year}-${month}-${day}`;
 
         const activeBatchEl = document.getElementById("currentBatch");
         if (activeBatchEl) {
@@ -434,24 +436,71 @@
             if (waxBarText) waxBarText.innerText = fallbackPercent + "% Completed";
         }
 
+        // Process Timer Variables & Firebase Synchronization
         let timerInterval = null;
         let secondsElapsed = 0;
+
+        // Fetch initial timer state from Firebase on load
+        get(timerDataRef).then((snapshot) => {
+            if (snapshot.exists()) {
+                const timerData = snapshot.val();
+                if (timerData.secondsElapsed !== undefined) {
+                    secondsElapsed = timerData.secondsElapsed;
+                    updateTimerDisplay();
+                }
+            }
+        }).catch((error) => {
+            console.error("Failed to retrieve initial timer state:", error);
+        });
 
         function startTimer() {
             if (timerInterval) return;
             timerInterval = setInterval(() => {
                 secondsElapsed++;
                 updateTimerDisplay();
+
+                const hrs = String(Math.floor(secondsElapsed / 3600)).padStart(2, '0');
+                const mins = String(Math.floor((secondsElapsed % 3600) / 60)).padStart(2, '0');
+                const secs = String(secondsElapsed % 60).padStart(2, '0');
+
+                // Real-time synchronization to timer metadata & daily total accumulator
+                update(timerDataRef, {
+                    secondsElapsed: secondsElapsed,
+                    formattedTime: `${hrs}:${mins}:${secs}`,
+                    isRunning: 1,
+                    lastUpdated: new Date().toISOString()
+                }).catch(err => console.error("Error syncing timer to Firebase:", err));
+
+                // Continuously update daily process time in real time every second while running
+                const dailyTotalRef = ref(db, `analytics/daily_process_time/${dateKey}`);
+                runTransaction(dailyTotalRef, (currentTotal) => {
+                    return (currentTotal || 0) + 1;
+                }).catch((error) => {
+                    console.error("Failed to update daily process time transaction:", error);
+                });
+
             }, 1000);
         }
 
-        function resetTimer() {
+        function stopTimerAndRecordDailyTotal() {
             if (timerInterval) {
                 clearInterval(timerInterval);
                 timerInterval = null;
             }
+
+            update(timerDataRef, {
+                secondsElapsed: 0,
+                formattedTime: "00:00:00",
+                isRunning: 0,
+                lastUpdated: new Date().toISOString()
+            }).catch(err => console.error("Error syncing timer stop to Firebase:", err));
+
             secondsElapsed = 0;
             updateTimerDisplay();
+        }
+
+        function resetTimer() {
+            stopTimerAndRecordDailyTotal();
         }
 
         function updateTimerDisplay() {

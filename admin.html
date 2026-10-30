@@ -141,8 +141,6 @@
             transform: translateX(22px);
         }
 
-
-
         .operator-info {
             display: flex;
             align-items: center;
@@ -304,7 +302,6 @@
             color: var(--accent-pink);
         }
 
-        /* Dynamic alerts & log scroll styling */
         .dynamic-alert-list {
             max-height: 160px;
             overflow-y: auto;
@@ -708,7 +705,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-        import { getDatabase, ref, get, query, orderByChild, equalTo, remove, update, onValue }
+        import { getDatabase, ref, get, query, orderByChild, equalTo, remove, update, onValue, runTransaction }
             from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
 
         const firebaseConfig = {
@@ -780,41 +777,9 @@
             }
         };
 
-        get(adminQuery).then((snapshot) => {
-            if (userList) userList.innerHTML = "";
-            if (snapshot.exists()) {
-                snapshot.forEach((childSnapshot) => {
-                    const data = childSnapshot.val();
-                    const uid = childSnapshot.key;
-                    const userEmail = data.email;
-
-                    const row = document.createElement("div");
-                    row.classList.add("control-pill-operator");
-                    row.innerHTML = `
-                        <i class="fa-solid fa-user fa-2xl control-item" style="color: var(--accent-pink);"></i>
-                        <div class="control-item-middle">
-                            <strong id="username_display">${userEmail}</strong><br>
-                            <small>Operator Account</small>
-                        </div>
-                        <button class="red no-design right control-item delete-user" onclick="deleteUser('${uid}')" style="background:#ef4444; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer;">Delete</button>
-                    `;
-                    if (userList) userList.appendChild(row);
-                });
-            }
-        });
-
-        window.deleteUser = function (uid) {
-            if (confirm("Delete this user?")) {
-                const userRef = ref(db, "users/" + uid);
-                update(userRef, { role: "deleted" }).then(() => {
-                    alert("User deleted");
-                    location.reload();
-                });
-            }
-        }
-
         const controlData = ref(db, "status");
         const sensorDataRef = ref(db, "data");
+        const timerDataRef = ref(db, "analytics/timer");
 
         let currentIsRunning = 0;
         let currentIsUvRunning = 0;
@@ -850,7 +815,12 @@
         }
 
         const today = new Date();
-        const generatedBatchName = `#BATCH-${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        const generatedBatchName = `#BATCH-${year}-${month}-${day}`;
+        const dateKey = `${year}-${month}-${day}`;
+
         if (document.getElementById("currentBatch")) {
             document.getElementById("currentBatch").innerText = generatedBatchName;
         }
@@ -881,6 +851,7 @@
             if (waxBarText) waxBarText.innerText = fallbackPercent + "% Completed";
         }
 
+        // Process Timer Variables & Firebase Synchronization
         let timerInterval = null;
         let secondsElapsed = 0;
 
@@ -888,23 +859,58 @@
             if (timerInterval) return;
             timerInterval = setInterval(() => {
                 secondsElapsed++;
+                updateTimerDisplay();
+
                 const hrs = String(Math.floor(secondsElapsed / 3600)).padStart(2, '0');
                 const mins = String(Math.floor((secondsElapsed % 3600) / 60)).padStart(2, '0');
                 const secs = String(secondsElapsed % 60).padStart(2, '0');
-                if (document.getElementById("processTimer")) {
-                    document.getElementById("processTimer").innerText = `${hrs}:${mins}:${secs}`;
-                }
+
+                update(timerDataRef, {
+                    secondsElapsed: secondsElapsed,
+                    formattedTime: `${hrs}:${mins}:${secs}`,
+                    isRunning: 1,
+                    lastUpdated: new Date().toISOString()
+                }).catch(err => console.error("Error syncing timer to Firebase:", err));
+
+                // Continuously update daily process time in real time every second while running
+                const dailyTotalRef = ref(db, `analytics/daily_process_time/${dateKey}`);
+                runTransaction(dailyTotalRef, (currentTotal) => {
+                    return (currentTotal || 0) + 1;
+                }).catch((error) => {
+                    console.error("Failed to update daily process time transaction:", error);
+                });
+
             }, 1000);
         }
 
-        function resetTimer() {
+        function stopTimerAndRecordDailyTotal() {
             if (timerInterval) {
                 clearInterval(timerInterval);
                 timerInterval = null;
             }
+
+            update(timerDataRef, {
+                secondsElapsed: 0,
+                formattedTime: "00:00:00",
+                isRunning: 0,
+                lastUpdated: new Date().toISOString()
+            }).catch(err => console.error("Error syncing timer stop to Firebase:", err));
+
             secondsElapsed = 0;
-            if (document.getElementById("processTimer")) {
-                document.getElementById("processTimer").innerText = "00:00:00";
+            updateTimerDisplay();
+        }
+
+        function resetTimer() {
+            stopTimerAndRecordDailyTotal();
+        }
+
+        function updateTimerDisplay() {
+            const hrs = String(Math.floor(secondsElapsed / 3600)).padStart(2, '0');
+            const mins = String(Math.floor((secondsElapsed % 3600) / 60)).padStart(2, '0');
+            const secs = String(secondsElapsed % 60).padStart(2, '0');
+            const timerEl = document.getElementById("processTimer");
+            if (timerEl) {
+                timerEl.innerText = `${hrs}:${mins}:${secs}`;
             }
         }
 

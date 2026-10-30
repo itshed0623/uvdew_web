@@ -231,28 +231,16 @@
         <div id="daily" class="section active">
             <div class="cards">
                 <div class="card">
-                    <h3>Total Today</h3>
+                    <h3>Total Today (Fruits)</h3>
                     <h1 id="todayTotal">0</h1>
                 </div>
                 <div class="card">
-                    <h3>UV Disinfected</h3>
-                    <h1 id="todayUV">0</h1>
-                </div>
-                <div class="card">
-                    <h3>Wax Coated</h3>
-                    <h1 id="todayWax">0</h1>
-                </div>
-                <div class="card">
-                    <h3>UV Runtime</h3>
+                    <h3>UV Runtime (Daily)</h3>
                     <h1 id="uvDailyTime">0 min</h1>
                 </div>
                 <div class="card">
-                    <h3>Wax Runtime</h3>
+                    <h3>Wax Runtime (Daily)</h3>
                     <h1 id="waxDailyTime">0 min</h1>
-                </div>
-                <div class="card">
-                    <h3>Energy Used</h3>
-                    <h1 id="energyDaily">0 kWh</h1>
                 </div>
             </div>
             <div class="charts-grid">
@@ -273,11 +261,11 @@
                     <h1 id="weeklyTotal">0</h1>
                 </div>
                 <div class="card">
-                    <h3>UV Runtime</h3>
+                    <h3>UV Runtime (Weekly)</h3>
                     <h1 id="uvWeeklyTime">0 min</h1>
                 </div>
                 <div class="card">
-                    <h3>Wax Runtime</h3>
+                    <h3>Wax Runtime (Weekly)</h3>
                     <h1 id="waxWeeklyTime">0 min</h1>
                 </div>
                 <div class="card">
@@ -303,11 +291,11 @@
                     <h1 id="monthlyTotal">0</h1>
                 </div>
                 <div class="card">
-                    <h3>UV Runtime</h3>
+                    <h3>UV Runtime (Monthly)</h3>
                     <h1 id="uvMonthlyTime">0 hrs</h1>
                 </div>
                 <div class="card">
-                    <h3>Wax Runtime</h3>
+                    <h3>Wax Runtime (Monthly)</h3>
                     <h1 id="waxMonthlyTime">0 hrs</h1>
                 </div>
                 <div class="card">
@@ -345,8 +333,8 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase();
-        const sensorDataRef = ref(db, "data");
-        const statusDataRef = ref(db, "status");
+        const batchesRef = ref(db, "batches");
+        const dailyTimeRef = ref(db, "analytics/daily_process_time");
 
         // Tab switching function
         window.showPage = function (page, btn) {
@@ -356,25 +344,19 @@
             if (btn) btn.classList.add('active-btn');
         };
 
-        // Chart Global Configuration
         Chart.defaults.font.family = 'Poppins';
         Chart.defaults.color = '#23181a';
-
-        // Base Data Arrays (Defaulting to 0)
-        const dailyVolumes = [0, 0, 0, 0, 0, 0, 0];
-        const uvDaily = [0, 0, 0, 0, 0, 0, 0];
-        const waxDaily = [0, 0, 0, 0, 0, 0, 0];
 
         // Initialize Charts
         const dailyChart = new Chart(document.getElementById('dailyChart'), {
             type: 'line',
-            data: { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], datasets: [{ label: 'Daily Fruit Volume', data: dailyVolumes, borderColor: '#b61b5a', backgroundColor: 'rgba(182, 27, 90, 0.1)', fill: true, borderWidth: 3, tension: 0.3 }] },
+            data: { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], datasets: [{ label: 'Daily Fruit Volume', data: [0, 0, 0, 0, 0, 0, 0], borderColor: '#b61b5a', backgroundColor: 'rgba(182, 27, 90, 0.1)', fill: true, borderWidth: 3, tension: 0.3 }] },
             options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
         });
 
         const dailyRuntimeChart = new Chart(document.getElementById('dailyRuntimeChart'), {
             type: 'bar',
-            data: { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], datasets: [{ label: 'UV Runtime (min)', data: uvDaily, backgroundColor: '#9b0742', borderRadius: 6 }, { label: 'Wax Runtime (min)', data: waxDaily, backgroundColor: '#d79eb1', borderRadius: 6 }] },
+            data: { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], datasets: [{ label: 'UV Runtime (min)', data: [0, 0, 0, 0, 0, 0, 0], backgroundColor: '#9b0742', borderRadius: 6 }, { label: 'Wax Runtime (min)', data: [0, 0, 0, 0, 0, 0, 0], backgroundColor: '#d79eb1', borderRadius: 6 }] },
             options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
         });
 
@@ -392,72 +374,168 @@
 
         const monthlyChart = new Chart(document.getElementById('monthlyChart'), {
             type: 'line',
-            data: { labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], datasets: [{ label: 'Monthly Fruit Volume', data: [0, 0, 0, 0, 0, 0], borderColor: '#b61b5a', backgroundColor: 'rgba(182, 27, 90, 0.1)', fill: true, borderWidth: 3, tension: 0.3 }] },
+            data: { labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'], datasets: [{ label: 'Monthly Fruit Volume', data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], borderColor: '#b61b5a', backgroundColor: 'rgba(182, 27, 90, 0.1)', fill: true, borderWidth: 3, tension: 0.3 }] },
             options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
         });
 
         const monthlyRuntimeChart = new Chart(document.getElementById('monthlyRuntimeChart'), {
             type: 'line',
-            data: { labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], datasets: [{ label: 'UV Runtime (hrs)', data: [0, 0, 0, 0, 0, 0], borderColor: '#9b0742', borderWidth: 2, tension: 0.3 }, { label: 'Wax Runtime (hrs)', data: [0, 0, 0, 0, 0, 0], borderColor: '#cb6499', borderWidth: 2, tension: 0.3 }] },
+            data: { labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'], datasets: [{ label: 'UV Runtime (hrs)', data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], borderColor: '#9b0742', borderWidth: 2, tension: 0.3 }, { label: 'Wax Runtime (hrs)', data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], borderColor: '#cb6499', borderWidth: 2, tension: 0.3 }] },
             options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
         });
 
-        // Sync Real-Time Firebase Telemetry (`data` and `status`) with 0-fallback handling
-        onValue(sensorDataRef, (snapshot) => {
-            let currentFruitCount = 0;
+        // 1. Fetch historical batches data from Firebase to populate fruit counts
+        // 1. Fetch historical batches data from Firebase to populate fruit counts
+        onValue(batchesRef, (snapshot) => {
+            let todayFruitCount = 0;
+            const dailyFruitCounts = [0, 0, 0, 0, 0, 0, 0]; // Mon, Tue, Wed, Thu, Fri, Sat, Sun
+            const weeklyFruitCounts = [0, 0, 0, 0]; // Week 1 to Week 4
+            const monthlyFruitCounts = Array(12).fill(0);
+
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            const currentMonth = now.getMonth(); // 0-indexed (0 = Jan, etc.)
+            const monthStr = String(currentMonth + 1).padStart(2, '0');
+            const dayStr = String(now.getDate()).padStart(2, '0');
+            const todayKey = `${currentYear}-${monthStr}-${dayStr}`;
 
             if (snapshot.exists()) {
-                const telemetry = snapshot.val();
-                currentFruitCount = telemetry.fruitCount !== undefined && telemetry.fruitCount !== null ? Number(telemetry.fruitCount) : 0;
+                const batchesData = snapshot.val();
+
+                Object.keys(batchesData).forEach(dateStr => {
+                    const batchNode = batchesData[dateStr];
+                    const count = batchNode.fruitCount !== undefined ? Number(batchNode.fruitCount) : 0;
+
+                    // Match Today
+                    if (dateStr === todayKey) {
+                        todayFruitCount = count;
+                    }
+
+                    // Parse batch date
+                    const batchDate = new Date(dateStr);
+                    if (!isNaN(batchDate.getTime())) {
+                        const bYear = batchDate.getFullYear();
+                        const bMonth = batchDate.getMonth();
+                        const bDay = batchDate.getDate();
+
+                        // Match Monthly (by YYYY-MM)
+                        if (bYear === currentYear) {
+                            monthlyFruitCounts[bMonth] += count;
+
+                            // Match Weekly if within current month
+                            if (bMonth === currentMonth) {
+                                const weekIndex = Math.min(Math.floor((bDay - 1) / 7), 3);
+                                weeklyFruitCounts[weekIndex] += count;
+
+                                // Check if the batch falls within the current week (Mon-Sun)
+                                const currentDayOfWeek = now.getDay() === 0 ? 6 : now.getDay() - 1; // 0 = Mon, ..., 6 = Sun
+                                const startDateOfWeek = new Date(now);
+                                startDateOfWeek.setDate(now.getDate() - currentDayOfWeek);
+                                startDateOfWeek.setHours(0, 0, 0, 0);
+
+                                const endDateOfWeek = new Date(startDateOfWeek);
+                                endDateOfWeek.setDate(startDateOfWeek.getDate() + 6);
+                                endDateOfWeek.setHours(23, 59, 59, 999);
+
+                                if (batchDate >= startDateOfWeek && batchDate <= endDateOfWeek) {
+                                    // Map Sunday (0) to index 6, Monday (1) to index 0, etc.
+                                    let dayIndex = batchDate.getDay() - 1;
+                                    if (dayIndex === -1) dayIndex = 6; // Sunday
+                                    dailyFruitCounts[dayIndex] += count;
+                                }
+                            }
+                        }
+                    }
+                });
             }
 
-            // 1. Update Daily Metrics with 0 fallback
-            document.getElementById('todayTotal').innerText = currentFruitCount;
-            document.getElementById('todayUV').innerText = Math.round(currentFruitCount * 0.6);
-            document.getElementById('todayWax').innerText = Math.round(currentFruitCount * 0.4);
-            document.getElementById('uvDailyTime').innerText = `${Math.round(currentFruitCount * 0.25)} min`;
-            document.getElementById('waxDailyTime').innerText = `${Math.round(currentFruitCount * 0.15)} min`;
-            document.getElementById('energyDaily').innerText = `${(currentFruitCount * 0.08).toFixed(1)} kWh`;
+            const totalWeeklyFruits = weeklyFruitCounts.reduce((a, b) => a + b, 0);
 
-            // Update today's entry on Daily chart
-            dailyVolumes[dailyVolumes.length - 1] = currentFruitCount;
-            uvDaily[uvDaily.length - 1] = Math.round(currentFruitCount * 0.25);
-            waxDaily[waxDaily.length - 1] = Math.round(currentFruitCount * 0.15);
+            // Update card elements
+            document.getElementById('todayTotal').innerText = todayFruitCount;
+            document.getElementById('weeklyTotal').innerText = totalWeeklyFruits;
+            document.getElementById('monthlyTotal').innerText = monthlyFruitCounts[currentMonth];
 
-            dailyChart.data.datasets[0].data = dailyVolumes;
+            // Update Charts
+            dailyChart.data.datasets[0].data = dailyFruitCounts;
             dailyChart.update();
 
-            dailyRuntimeChart.data.datasets[0].data = uvDaily;
-            dailyRuntimeChart.data.datasets[1].data = waxDaily;
-            dailyRuntimeChart.update();
-
-            // 2. Integrate Daily Data into Weekly View
-            const currentWeekTotal = dailyVolumes.reduce((a, b) => a + b, 0);
-            const currentWeekUVTime = uvDaily.reduce((a, b) => a + b, 0);
-            const currentWeekWaxTime = waxDaily.reduce((a, b) => a + b, 0);
-
-            document.getElementById('weeklyTotal').innerText = currentWeekTotal;
-            document.getElementById('uvWeeklyTime').innerText = `${currentWeekUVTime} min`;
-            document.getElementById('waxWeeklyTime').innerText = `${currentWeekWaxTime} min`;
-            document.getElementById('waxWeeklyUsed').innerText = `${(currentWeekTotal * 0.0005).toFixed(2)} L`;
-
-            const weeklyData = weeklyChart.data.datasets[0].data;
-            weeklyData[weeklyData.length - 1] = currentWeekTotal;
+            weeklyChart.data.datasets[0].data = weeklyFruitCounts;
             weeklyChart.update();
 
-            // 3. Integrate Weekly Data into Monthly View
-            const currentMonthTotal = currentWeekTotal;
-            const totalUVHours = (currentWeekUVTime / 60).toFixed(1);
-            const totalWaxHours = (currentWeekWaxTime / 60).toFixed(1);
-
-            document.getElementById('monthlyTotal').innerText = currentMonthTotal;
-            document.getElementById('uvMonthlyTime').innerText = `${totalUVHours} hrs`;
-            document.getElementById('waxMonthlyTime').innerText = `${totalWaxHours} hrs`;
-            document.getElementById('energyMonthly').innerText = `${(currentMonthTotal * 0.08).toFixed(1)} kWh`;
-
-            const monthlyData = monthlyChart.data.datasets[0].data;
-            monthlyData[monthlyData.length - 1] = currentMonthTotal;
+            monthlyChart.data.datasets[0].data = monthlyFruitCounts;
             monthlyChart.update();
+        });
+
+        // 2. Fetch daily process times from Firebase for runtimes & analytics
+        onValue(dailyTimeRef, (snapshot) => {
+            let totalSecondsToday = 0;
+            let totalSecondsWeekly = 0;
+            const monthlySeconds = Array(12).fill(0); // Jan to Dec
+
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const todayKey = `${currentYear}-${month}-${day}`;
+
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+
+                if (data[todayKey]) {
+                    totalSecondsToday = Number(data[todayKey]);
+                }
+
+                Object.keys(data).forEach(dateStr => {
+                    const sec = Number(data[dateStr]) || 0;
+                    totalSecondsWeekly += sec; // Aggregated for weekly view
+
+                    // Parse date to group by month
+                    const recordDate = new Date(dateStr);
+                    if (!isNaN(recordDate.getTime())) {
+                        const rYear = recordDate.getFullYear();
+                        const rMonth = recordDate.getMonth(); // 0 (Jan) - 11 (Dec)
+                        if (rYear === currentYear) {
+                            monthlySeconds[rMonth] += sec;
+                        }
+                    }
+                });
+            }
+
+            const dailyMins = Math.round(totalSecondsToday / 60);
+            const weeklyMins = Math.round(totalSecondsWeekly / 60);
+            const monthlyHoursTotal = (monthlySeconds[now.getMonth()] / 3600).toFixed(1);
+
+            // Convert monthly seconds array to hours for each month
+            const monthlyUVHours = monthlySeconds.map(sec => Number((sec / 3600).toFixed(1)));
+            const monthlyWaxHours = monthlySeconds.map(sec => Number(((sec * 0.6) / 3600).toFixed(1)));
+
+            // Display summaries
+            document.getElementById('uvDailyTime').innerText = `${dailyMins} min`;
+            document.getElementById('waxDailyTime').innerText = `${Math.round(dailyMins * 0.6)} min`;
+
+            document.getElementById('uvWeeklyTime').innerText = `${weeklyMins} min`;
+            document.getElementById('waxWeeklyTime').innerText = `${Math.round(weeklyMins * 0.6)} min`;
+            document.getElementById('waxWeeklyUsed').innerText = `${(weeklyMins * 0.01).toFixed(2)} L`;
+
+            document.getElementById('uvMonthlyTime').innerText = `${monthlyHoursTotal} hrs`;
+            document.getElementById('waxMonthlyTime').innerText = `${(monthlyHoursTotal * 0.6).toFixed(1)} hrs`;
+            document.getElementById('energyMonthly').innerText = `${(monthlyHoursTotal * 1.5).toFixed(1)} kWh`;
+
+            // Update daily runtime bar chart
+            dailyRuntimeChart.data.datasets[0].data[6] = dailyMins;
+            dailyRuntimeChart.data.datasets[1].data[6] = Math.round(dailyMins * 0.6);
+            dailyRuntimeChart.update();
+
+            // Update weekly runtime bar chart
+            weeklyRuntimeChart.data.datasets[0].data[3] = weeklyMins;
+            weeklyRuntimeChart.data.datasets[1].data[3] = Math.round(weeklyMins * 0.6);
+            weeklyRuntimeChart.update();
+
+            // Update monthly runtime line chart
+            monthlyRuntimeChart.data.datasets[0].data = monthlyUVHours;
+            monthlyRuntimeChart.data.datasets[1].data = monthlyWaxHours;
+            monthlyRuntimeChart.update();
         });
     </script>
 
