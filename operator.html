@@ -83,6 +83,88 @@
             max-height: 220px;
             overflow-y: auto;
         }
+
+        /* Robust Mobile Layout & Overflow Fixes */
+        @media only screen and (max-width: 768px) {
+            body {
+                overflow-x: hidden;
+            }
+
+            header {
+                padding: 16px;
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            .logout_container {
+                width: 100%;
+                justify-content: flex-end;
+            }
+
+            .system-summary-bar {
+                width: 100% !important;
+                max-width: 100% !important;
+                margin: 10px 0 !important;
+                padding: 0 12px !important;
+                grid-template-columns: 1fr 1fr !important;
+                gap: 10px;
+                box-sizing: border-box;
+            }
+
+            .summary-card {
+                padding: 12px;
+                gap: 10px;
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            .summary-icon {
+                font-size: 1.4rem;
+            }
+
+            .summary-value {
+                font-size: 0.95rem;
+            }
+
+            main {
+                width: 100% !important;
+                max-width: 100% !important;
+                margin: 12px 0 !important;
+                padding: 0 12px !important;
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 16px !important;
+                box-sizing: border-box !important;
+            }
+
+            aside,
+            .process,
+            .temp_not,
+            .alert-section-full,
+            .activity-log-section {
+                width: 100% !important;
+                max-width: 100% !important;
+                grid-column: auto !important;
+                padding: 16px !important;
+                border-radius: 16px !important;
+                box-sizing: border-box !important;
+                margin: 0 !important;
+            }
+
+            .uv-wax-side-by-side {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+
+        @media only screen and (max-width: 480px) {
+            .system-summary-bar {
+                grid-template-columns: 1fr !important;
+            }
+        }
     </style>
 </head>
 
@@ -149,7 +231,7 @@
                         <h4 id="uvStart">UV Disinfect</h4>
                     </li>
                     <!-- function for turning on wax onclick="waxOn()" -->
-                    <li class="control-pill" id="waxStartContainer">
+                    <li class="control-pill" id="waxStartContainer" onclick="waxOn()">
                         <i class="fa-solid fa-droplet fa-lg" id="waxStartIcon"></i>
                         <h4 id="waxStart">Wax Coat</h4>
                     </li>
@@ -187,8 +269,6 @@
                 </div>
                 <p id="waxBarText">0% Completed</p>
             </div>
-
-
         </section>
 
         <!-- Metrics Column 2: Temperatures & Manual Controls -->
@@ -207,22 +287,6 @@
                     <h1 id="processTimer" style="font-size: 2.2rem;">00:00:00</h1>
                 </div>
             </div>
-            <!-- Manual Adjustment Controls -->
-            <!-- <div class="manual-controls">
-                <h4>Manual Adjustments</h4>
-                <div class="control-group">
-                    <label for="speedRange">Conveyor Speed (<span id="speedVal">60</span> RPM)</label>
-                    <input type="range" id="speedRange" min="0" max="60" value="60" class="slider"
-                        oninput="updateConveyorSpeed(this.value)">
-                </div>
-                <div class="control-group">
-                    <label for="fanToggle">Air Dryer Blower</label>
-                    <label class="switch">
-                        <input type="checkbox" id="fanToggle" onchange="updateFanToggle(this.checked)">
-                        <span class="slider-toggle round"></span>
-                    </label>
-                </div>
-            </div> -->
         </section>
 
         <!-- Full-Width Scrollable Live System Alerts Section -->
@@ -275,24 +339,6 @@
         }
     </script>
 
-    <!-- Modal Event Listeners -->
-    <script>
-        const power_modal = document.getElementById("power_modal");
-        const noBtn = document.getElementById("noBtn");
-
-        document.getElementById("startContainer").addEventListener("click", function () {
-            power_modal.style.display = "flex";
-        });
-        if (noBtn) {
-            noBtn.onclick = function () {
-                power_modal.style.display = "none";
-            }
-        }
-        window.onclick = function (e) {
-            if (e.target == power_modal) power_modal.style.display = "none";
-        }
-    </script>
-
     <!-- Firebase Realtime Sync & Control Functions -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
@@ -322,14 +368,13 @@
         let currentTemp = 28;
         let currentWaxPercent = 0;
 
-        // Keep track of dismissed alert IDs
         const dismissedAlerts = new Set();
         const activityLogs = [];
 
         function logActivity(description, source = "Operator", statusType = "success", statusText = "Active") {
             const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
             activityLogs.unshift({ time: timeStr, desc: description, source, statusType, statusText });
-            if (activityLogs.length > 25) activityLogs.pop(); // Cap history limit
+            if (activityLogs.length > 25) activityLogs.pop();
             renderActivityLog();
         }
 
@@ -349,7 +394,6 @@
             });
         }
 
-        // Automatically generate today's batch string (e.g., #BATCH-2026-06-07)
         const today = new Date();
         const year = today.getFullYear();
         const month = String(today.getMonth() + 1).padStart(2, '0');
@@ -361,7 +405,6 @@
             activeBatchEl.innerText = generatedBatchName;
         }
 
-        // Wax Progress Loop Variables
         let waxInterval = null;
         let currentProgress = 0;
 
@@ -391,7 +434,6 @@
             if (waxBarText) waxBarText.innerText = fallbackPercent + "% Completed";
         }
 
-        // Process Timer Variables
         let timerInterval = null;
         let secondsElapsed = 0;
 
@@ -492,7 +534,6 @@
             logActivity(`Alert acknowledged / cleared: ${alertId}`, "Operator", "info", "Acknowledged");
         };
 
-        // Track previous status states to log changes only when toggled
         let prevRunningState = null;
         let prevUvState = null;
         let prevWaxState = null;
@@ -504,11 +545,6 @@
                 currentIsUvRunning = data.uvStatus || 0;
                 currentIsWaxRunning = data.waxStatus || 0;
                 const funStatus = data.funStatus || 0;
-
-                const fanToggleEl = document.getElementById("fanToggle");
-                if (fanToggleEl) {
-                    fanToggleEl.checked = (funStatus === 1);
-                }
 
                 if (prevRunningState !== null && prevRunningState !== currentIsRunning) {
                     logActivity(currentIsRunning === 1 ? "System Started" : "System Stopped", "System PLC", currentIsRunning === 1 ? "success" : "info", currentIsRunning === 1 ? "Active" : "Stopped");
@@ -529,15 +565,11 @@
                     document.getElementById("start").innerHTML = "Stop System";
                     document.getElementById('startContainer').style.border = "2px #EF4444 solid";
                     document.getElementById('startIcon').classList.add('startAnimation');
-                    if (power_modal) power_modal.style.display = "none";
-                    if (document.getElementById('onOrOff')) document.getElementById('onOrOff').innerHTML = 'off';
                     startTimer();
                 } else {
                     document.getElementById("start").innerHTML = "Start System";
                     document.getElementById('startContainer').style.border = "";
                     document.getElementById('startIcon').classList.remove('startAnimation');
-                    if (power_modal) power_modal.style.display = "none";
-                    if (document.getElementById('onOrOff')) document.getElementById('onOrOff').innerHTML = 'on';
                     resetTimer();
                 }
 
@@ -589,7 +621,6 @@
                     waxPercentDisplayEl.innerText = currentWaxPercent;
                 }
 
-                // Updated to read 'temperature' from Firebase and format to 1 decimal place (or use Math.round if you prefer whole numbers)
                 const rawTemp = telemetry.temperature !== undefined ? telemetry.temperature : 28;
                 currentTemp = typeof rawTemp === 'number' ? Number(rawTemp.toFixed(1)) : rawTemp;
 
@@ -598,56 +629,22 @@
                     temperatureEl.innerText = currentTemp;
                 }
 
-                const motorSpeedVal = telemetry.motorSpeed !== undefined ? telemetry.motorSpeed : 0;
-                const derivedRpm = Math.round((motorSpeedVal / 255) * 60);
-                const speedRangeEl = document.getElementById("speedRange");
-                const speedValEl = document.getElementById("speedVal");
-                if (speedRangeEl && !speedRangeEl.matches(':active')) {
-                    speedRangeEl.value = derivedRpm;
-                }
-                if (speedValEl) {
-                    speedValEl.innerText = derivedRpm;
-                }
-
                 evaluateAlerts();
-            } else {
-                console.log("No telemetry data found under /data");
             }
         });
 
-        window.updateConveyorSpeed = function (rpmValue) {
-            document.getElementById('speedVal').innerText = rpmValue;
-            const mappedMotorSpeed = Math.round((rpmValue / 60) * 255);
-            const dataRef = ref(db, "data");
-            update(dataRef, { motorSpeed: mappedMotorSpeed }).catch((error) => {
-                console.error("Failed to update motorSpeed:", error);
-            });
-            logActivity(`Conveyor speed adjusted to ${rpmValue} RPM`, "Operator", "info", "Logged");
-        };
-
-        window.updateFanToggle = function (isChecked) {
-            const statusRef = ref(db, "status");
-            const funStatusVal = isChecked ? 1 : 0;
-            update(statusRef, { funStatus: funStatusVal }).catch((error) => {
-                console.error("Failed to update funStatus:", error);
-            });
-            logActivity(`Air Dryer Blower turned ${isChecked ? "ON" : "OFF"}`, "Operator", "info", "Logged");
-        };
-        let uvOnStatus = false;
         window.powerOn = function () {
             const setStart = ref(db, "status");
             if (currentIsRunning === 1) {
                 update(setStart, { isRunning: 0 }).catch((error) => console.error("Failed to stop system:", error));
-                uvOnStatus = true;
             } else {
                 update(setStart, { isRunning: 1 }).catch((error) => console.error("Failed to start system:", error));
-                uvOnStatus = false;
             }
         };
 
         window.uvOn = function () {
             if (currentIsRunning !== 1) {
-                return; // Block execution when system is not running
+                return;
             }
             const setUv = ref(db, "status");
             if (currentIsUvRunning === 1) {
@@ -666,7 +663,6 @@
             }
         };
 
-        // Initialize default initial activity log entry
         logActivity("Operator Portal initialized & connected", "System", "success", "Online");
     </script>
 </body>
