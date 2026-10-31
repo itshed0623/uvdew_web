@@ -11,7 +11,7 @@
     <style>
         /* Smooth transition for progress bar animation when waxStatus is active */
         #waxBar {
-            transition: width 0.05s linear;
+            transition: width 0.3s ease;
         }
 
         /* Layout styling to display UV Intensity and Wax Percent side by side */
@@ -230,8 +230,8 @@
                         <i class="fa-solid fa-lightbulb fa-lg" id="uvStartIcon"></i>
                         <h4 id="uvStart">UV Disinfect</h4>
                     </li>
-                    <!-- function for turning on wax onclick="waxOn()"  -->
-                    <li class="control-pill" id="waxStartContainer">
+                    <!-- Fixed missing onclick="waxOn()" handler -->
+                    <li class="control-pill" onclick="waxOn()" id="waxStartContainer">
                         <i class="fa-solid fa-droplet fa-lg" id="waxStartIcon"></i>
                         <h4 id="waxStart">Wax Coat</h4>
                     </li>
@@ -342,7 +342,7 @@
     <!-- Firebase Realtime Sync & Control Functions -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-        import { getDatabase, ref, update, onValue, get, set, runTransaction }
+        import { getDatabase, ref, update, onValue, get, runTransaction }
             from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
 
         const firebaseConfig = {
@@ -407,6 +407,7 @@
             activeBatchEl.innerText = generatedBatchName;
         }
 
+        // Wax Progress Bar Loop Implementation
         let waxInterval = null;
         let currentProgress = 0;
 
@@ -421,7 +422,7 @@
                 const waxBarText = document.getElementById("waxBarText");
                 if (waxBar) waxBar.style.width = currentProgress + "%";
                 if (waxBarText) waxBarText.innerText = currentProgress + "% Completed";
-            }, 100);
+            }, 300);
         }
 
         function stopWaxLoop(fallbackPercent = 0) {
@@ -436,77 +437,50 @@
             if (waxBarText) waxBarText.innerText = fallbackPercent + "% Completed";
         }
 
-        // Process Timer Variables & Firebase Synchronization
-        let timerInterval = null;
-        let secondsElapsed = 0;
+        // Process Timer Variables & Timestamp-Based Synchronization
+        let clientTimerInterval = null;
 
-        // Fetch initial timer state from Firebase on load
-        get(timerDataRef).then((snapshot) => {
+        onValue(timerDataRef, (snapshot) => {
             if (snapshot.exists()) {
                 const timerData = snapshot.val();
-                if (timerData.secondsElapsed !== undefined) {
-                    secondsElapsed = timerData.secondsElapsed;
-                    updateTimerDisplay();
+                const isRunning = timerData.isRunning || 0;
+                const startTime = timerData.startTime || null;
+
+                if (isRunning === 1 && startTime) {
+                    if (!clientTimerInterval) {
+                        clientTimerInterval = setInterval(() => {
+                            const currentElapsedSecs = Math.floor((Date.now() - startTime) / 1000);
+                            updateTimerDisplayFromSeconds(currentElapsedSecs);
+
+                            // Continuously record daily process time accumulator
+                            const dailyTotalRef = ref(db, `analytics/daily_process_time/${dateKey}`);
+                            runTransaction(dailyTotalRef, (currentTotal) => {
+                                return (currentTotal || 0) + 1;
+                            }).catch((error) => {
+                                console.error("Failed to update daily process time transaction:", error);
+                            });
+                        }, 1000);
+                    }
+                } else {
+                    if (clientTimerInterval) {
+                        clearInterval(clientTimerInterval);
+                        clientTimerInterval = null;
+                    }
+                    updateTimerDisplayFromSeconds(0);
                 }
+            } else {
+                if (clientTimerInterval) {
+                    clearInterval(clientTimerInterval);
+                    clientTimerInterval = null;
+                }
+                updateTimerDisplayFromSeconds(0);
             }
-        }).catch((error) => {
-            console.error("Failed to retrieve initial timer state:", error);
         });
 
-        function startTimer() {
-            if (timerInterval) return;
-            timerInterval = setInterval(() => {
-                secondsElapsed++;
-                updateTimerDisplay();
-
-                const hrs = String(Math.floor(secondsElapsed / 3600)).padStart(2, '0');
-                const mins = String(Math.floor((secondsElapsed % 3600) / 60)).padStart(2, '0');
-                const secs = String(secondsElapsed % 60).padStart(2, '0');
-
-                // Real-time synchronization to timer metadata & daily total accumulator
-                update(timerDataRef, {
-                    secondsElapsed: secondsElapsed,
-                    formattedTime: `${hrs}:${mins}:${secs}`,
-                    isRunning: 1,
-                    lastUpdated: new Date().toISOString()
-                }).catch(err => console.error("Error syncing timer to Firebase:", err));
-
-                // Continuously update daily process time in real time every second while running
-                const dailyTotalRef = ref(db, `analytics/daily_process_time/${dateKey}`);
-                runTransaction(dailyTotalRef, (currentTotal) => {
-                    return (currentTotal || 0) + 1;
-                }).catch((error) => {
-                    console.error("Failed to update daily process time transaction:", error);
-                });
-
-            }, 1000);
-        }
-
-        function stopTimerAndRecordDailyTotal() {
-            if (timerInterval) {
-                clearInterval(timerInterval);
-                timerInterval = null;
-            }
-
-            update(timerDataRef, {
-                secondsElapsed: 0,
-                formattedTime: "00:00:00",
-                isRunning: 0,
-                lastUpdated: new Date().toISOString()
-            }).catch(err => console.error("Error syncing timer stop to Firebase:", err));
-
-            secondsElapsed = 0;
-            updateTimerDisplay();
-        }
-
-        function resetTimer() {
-            stopTimerAndRecordDailyTotal();
-        }
-
-        function updateTimerDisplay() {
-            const hrs = String(Math.floor(secondsElapsed / 3600)).padStart(2, '0');
-            const mins = String(Math.floor((secondsElapsed % 3600) / 60)).padStart(2, '0');
-            const secs = String(secondsElapsed % 60).padStart(2, '0');
+        function updateTimerDisplayFromSeconds(totalSeconds) {
+            const hrs = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+            const mins = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+            const secs = String(totalSeconds % 60).padStart(2, '0');
             const timerEl = document.getElementById("processTimer");
             if (timerEl) {
                 timerEl.innerText = `${hrs}:${mins}:${secs}`;
@@ -593,7 +567,6 @@
                 currentIsRunning = data.isRunning || 0;
                 currentIsUvRunning = data.uvStatus || 0;
                 currentIsWaxRunning = data.waxStatus || 0;
-                const funStatus = data.funStatus || 0;
 
                 if (prevRunningState !== null && prevRunningState !== currentIsRunning) {
                     logActivity(currentIsRunning === 1 ? "System Started" : "System Stopped", "System PLC", currentIsRunning === 1 ? "success" : "info", currentIsRunning === 1 ? "Active" : "Stopped");
@@ -614,12 +587,10 @@
                     document.getElementById("start").innerHTML = "Stop System";
                     document.getElementById('startContainer').style.border = "2px #EF4444 solid";
                     document.getElementById('startIcon').classList.add('startAnimation');
-                    startTimer();
                 } else {
                     document.getElementById("start").innerHTML = "Start System";
                     document.getElementById('startContainer').style.border = "";
                     document.getElementById('startIcon').classList.remove('startAnimation');
-                    resetTimer();
                 }
 
                 if (currentIsUvRunning === 1) {
@@ -632,6 +603,7 @@
                     document.getElementById('uvStartIcon').classList.remove('startAnimation');
                 }
 
+                // Handle Wax Coat button visual start/stop sign indicators and progress bar loop
                 if (currentIsWaxRunning === 1) {
                     document.getElementById("waxStart").innerHTML = "Stop Wax";
                     document.getElementById('waxStartContainer').style.border = "2px #EF4444 solid";
@@ -684,32 +656,26 @@
 
         window.powerOn = function () {
             const setStart = ref(db, "status");
+            const timerRef = ref(db, "analytics/timer");
             if (currentIsRunning === 1) {
-                update(setStart, { isRunning: 0 }).catch((error) => console.error("Failed to stop system:", error));
+                update(setStart, { isRunning: 0 });
+                update(timerRef, { isRunning: 0, startTime: null, lastUpdated: new Date().toISOString() });
             } else {
-                update(setStart, { isRunning: 1 }).catch((error) => console.error("Failed to start system:", error));
+                const nowTimestamp = Date.now();
+                update(setStart, { isRunning: 1 });
+                update(timerRef, { isRunning: 1, startTime: nowTimestamp, lastUpdated: new Date().toISOString() });
             }
         };
 
         window.uvOn = function () {
-            if (currentIsRunning !== 1) {
-                return;
-            }
+            if (currentIsRunning !== 1) return;
             const setUv = ref(db, "status");
-            if (currentIsUvRunning === 1) {
-                update(setUv, { uvStatus: 0 }).catch((error) => console.error("Failed to stop UV:", error));
-            } else {
-                update(setUv, { uvStatus: 1 }).catch((error) => console.error("Failed to start UV:", error));
-            }
+            update(setUv, { uvStatus: currentIsUvRunning === 1 ? 0 : 1 });
         };
 
         window.waxOn = function () {
             const setWax = ref(db, "status");
-            if (currentIsWaxRunning === 1) {
-                update(setWax, { waxStatus: 0 }).catch((error) => console.error("Failed to stop Wax:", error));
-            } else {
-                update(setWax, { waxStatus: 1 }).catch((error) => console.error("Failed to start Wax:", error));
-            }
+            update(setWax, { waxStatus: currentIsWaxRunning === 1 ? 0 : 1 });
         };
 
         logActivity("Operator Portal initialized & connected", "System", "success", "Online");
